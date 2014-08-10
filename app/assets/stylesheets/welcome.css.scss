@@ -1,0 +1,49 @@
+// Place all the styles related to the welcome controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.welcome_container {
+    width: 100%;
+}
+
+#splash {
+    display: block;
+    margin-top: 2em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+// TODO: move these out of this stylesheet
+.nav_container {
+    width: 100%;
+    border-bottom-style: solid;
+    border-bottom-color: #245057;
+    border-bottom-width: 0.5em;
+}
+
+.nav_list {
+    font-family: "cubano", verdana, arial, helvetica, sans-serif;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+
+    a {
+        text-decoration: none;
+    }
+
+    li {
+        display: inline;
+        list-style-type: none;
+        margin-left: 5%;
+        margin-right: 5%;
+        padding: 1%;
+    }
+
+    li.current {
+        background-color: #339E4F;
+        border-radius: 10px;
+    }
+
+}
