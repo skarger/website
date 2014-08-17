@@ -1,5 +1,6 @@
 <div class="nav_container">
     <ul class="nav_list">
         <li class="<%= current_page?(root_path) ? :current : nil %>"><a class="nav_list" href="/">/</a></li>
+        <li class="<%= current_page?(workouts_path) ? :current : nil %>"><a class="nav_list" href=<%= workouts_path %> >WORKOUTS</a></li>
     </ul>
 </div>
