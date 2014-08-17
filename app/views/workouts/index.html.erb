@@ -9,7 +9,7 @@
 
 <% @workouts.each do |workout| %>
   <tr>
-    <td><%= workout.where %></td><td><%= workout.when.strftime('%b %d %Y') %></td><td><%= link_to 'Show', workout %></td>
+    <td><%= workout.where %></td><td><%= workout.when.strftime('%b %d %Y') %></td><td><%= link_to 'Show', workout_path(workout) %></td>
   </tr>
 <% end %>
 </table>

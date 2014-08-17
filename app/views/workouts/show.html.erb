@@ -2,8 +2,5 @@
 
 
 <%= link_to 'Back', workouts_path %>
-<ul>
-<% @workout.exercises.each do |e| %>
-    <li><%= e.name %> | <%= e.category %></li>
-<% end %>
-</ul>
+
+<%= render @workout %>
