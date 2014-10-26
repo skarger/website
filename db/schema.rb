@@ -36,8 +36,8 @@ ActiveRecord::Schema.define(version: 20140824224213) do
   create_table "workouts", force: true do |t|
     t.datetime "when"
     t.string   "where"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "notes"
     t.string   "type"
   end

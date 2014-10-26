@@ -45,7 +45,7 @@ test:
   database: website_test
   pool: 5
   username: website
-  password:
+  password: website
 
 production:
   adapter: postgresql
