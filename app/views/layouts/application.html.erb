@@ -10,6 +10,9 @@
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 </head>
 <body>
+<% flash.each do |name, msg| -%>
+  <%= content_tag :div, msg, class: name %>
+<% end -%>
 <%= render "layouts/nav" %>
 <%= yield %>
 
