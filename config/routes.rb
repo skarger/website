@@ -54,10 +54,9 @@ Rails.application.routes.draw do
   #     resources :products
   #   end
 
-  resources :workouts, only: [:index, :show]
+  resources :workouts, only: [:index, :show, :update]
 
-  resources :sessions, only: [:new, :create, :destroy]
-
-  match '/signin', to: 'sessions#new', via: 'get'
-  match '/signout', to: 'sessions#destroy', via: 'delete'
+  match '/login', to: 'sessions#new', via: 'get'
+  match '/login', to: 'sessions#create', via: 'post'
+  match '/logout', to: 'sessions#destroy', via: 'delete'
 end
