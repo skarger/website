@@ -59,7 +59,7 @@ class WorkoutsController < ApplicationController
     @workout = Workout.find(params[:id])
 
     respond_to do |format|
-      if @workout.update_attributes(params[:workout])
+      if @workout.update_attributes(workout_params)
         format.html { redirect_to @workout, notice: 'Workout was successfully updated.' }
         format.json { head :no_content }
       else
@@ -79,5 +79,10 @@ class WorkoutsController < ApplicationController
       format.html { redirect_to workouts_url }
       format.json { head :no_content }
     end
+  end
+
+  private
+  def workout_params
+    params.require(:workout).permit(:where)
   end
 end
