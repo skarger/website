@@ -17,4 +17,9 @@ RSpec.describe User, :type => :model do
     v = u.dup
     expect(v.valid?).to be_falsey
   end
+
+  it 'should store the email as lowercase' do
+      u = User.create(email: 'TEST@ALLCAPS.COM', password: 'secret')
+      expect(u.email).to eq('test@allcaps.com')
+  end
 end
