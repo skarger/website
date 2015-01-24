@@ -54,12 +54,7 @@ Rails.application.routes.draw do
   #     resources :products
   #   end
 
-  # until we actually want people to sign up let's not allow it in production
-  if Rails.env.production?
-    resources :users, only: [:show]
-  else
-    resources :users, only: [:new, :create, :show]
-  end
+  resources :users, only: [:new, :create, :show]
 
   resources :workouts, only: [:index, :show, :update]
 
