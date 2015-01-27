@@ -58,7 +58,7 @@ Rails.application.routes.draw do
 
   resources :workouts, only: [:index, :show, :update]
 
-  match '/login', to: 'sessions#new', via: 'get'
-  match '/login', to: 'sessions#create', via: 'post'
-  match '/logout', to: 'sessions#destroy', via: 'delete'
+  get '/login', to: 'sessions#new'
+  post '/login', to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy'
 end
