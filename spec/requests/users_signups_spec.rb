@@ -18,6 +18,7 @@ RSpec.describe "UsersSignups", :type => :request do
                                  password_confirmation: "password" }
       }.to change{User.count}.by(1)
       assert_template 'users/show'
+      expect(flash).not_to be_empty
     end
   end
 end
