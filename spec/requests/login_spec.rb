@@ -26,13 +26,29 @@ RSpec.describe "Login", :type => :request do
       expect(flash).to be_empty
     end
 
+    let(:email) {'test@test.com' }
+    let(:password) {'secret'}
+    let!(:user) {User.create({email: email, password: password})}
     it "should show user after valid login" do
-      user = User.create({email: 'test@test.com', password: 'secret'})
       get login_path
       assert_template 'sessions/new'
-      post login_path, session: { email: 'test@test.com', password: 'secret' }
+      post login_path, session: { email: email, password: password }
       follow_redirect!
       assert_template 'users/show'
+    end
+
+    it "should show a log in link before the user logs in" do
+      get root_path
+      assert_select "a[href=?]", login_path, count: 1
+      assert_select "a[href=?]", logout_path, count: 0
+    end
+
+    it "should show a log out link after the user logs in" do
+      get login_path
+      post login_path, session: { email: email, password: password }
+      follow_redirect!
+      assert_select "a[href=?]", login_path, count: 0
+      assert_select "a[href=?]", logout_path, count: 1
     end
   end
 end
