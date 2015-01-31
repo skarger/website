@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "Login", :type => :request do
+  let(:email) {'test@test.com' }
+  let(:password) {'secret'}
+  let!(:user) {User.create({email: email, password: password})}
+
   describe "GET /login" do
     it "should present the new session form" do
       get login_path
@@ -26,9 +30,6 @@ RSpec.describe "Login", :type => :request do
       expect(flash).to be_empty
     end
 
-    let(:email) {'test@test.com' }
-    let(:password) {'secret'}
-    let!(:user) {User.create({email: email, password: password})}
     it "should show user after valid login" do
       get login_path
       assert_template 'sessions/new'
@@ -49,6 +50,17 @@ RSpec.describe "Login", :type => :request do
       follow_redirect!
       assert_select "a[href=?]", login_path, count: 0
       assert_select "a[href=?]", logout_path, count: 1
+    end
+  end
+
+  describe "DELETE /logout" do
+    it "should redirect to the site root after the user logs out" do
+      get login_path
+      post login_path, session: { email: email, password: password }
+      follow_redirect!
+      delete logout_path
+      follow_redirect!
+      assert_template 'welcome/index'
     end
   end
 end
