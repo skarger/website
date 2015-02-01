@@ -12,6 +12,33 @@ require 'rails_helper'
 # end
 RSpec.describe SessionsHelper, :type => :helper do
   let!(:user) {User.create(email: 'test@test.com', password: 'secret')}
+
+  describe '#current_user' do
+    before(:each) do
+      helper.remember(user)
+    end
+
+    context 'session is not nil' do
+      it 'should return the user' do
+        session[:user_id] = user.id
+        expect(current_user).to eq(user)
+      end
+    end
+
+    context 'session is nil'
+      before(:each) do
+        session[:user_id] = nil
+      end
+      it 'should return the remembered user' do
+        expect(current_user).to eq(user)
+      end
+
+      it 'should return nil when given token is wrong' do
+        cookies['remember_token'] = 'fake'
+        expect(current_user).to be_nil
+      end
+  end
+
   describe '#remember' do
     it 'should cause the user to have a remember_digest' do
       expect{ helper.remember(user) }.to change{user.remember_digest}
