@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+include SessionsHelper
+
 RSpec.describe "UsersSignups", :type => :request do
   describe "POST /users" do
     it "should not create a new user if given a blank password" do
@@ -20,5 +22,12 @@ RSpec.describe "UsersSignups", :type => :request do
       assert_template 'users/show'
       expect(flash).not_to be_empty
     end
+
+    it "should log in the new user after successful signup" do
+       post users_path, user: { email: "test@test.com",
+                                 password: "password",
+                                 password_confirmation: "password" }
+        expect(logged_in?).to be_truthy
+     end
   end
 end
