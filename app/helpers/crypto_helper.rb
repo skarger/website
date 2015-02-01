@@ -5,7 +5,11 @@ module CryptoHelper
     BCrypt::Password.create(string, cost: cost)
   end
 
-  def token_matches?(string, token)
-    BCrypt::Password.new(token) == string
+  def random_token
+    SecureRandom.urlsafe_base64
+  end
+
+  def token_matches?(unencrypted, encrypted)
+    BCrypt::Password.new(encrypted).is_password?(unencrypted)
   end
 end

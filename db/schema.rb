@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20150201004618) do
   create_table "run_intervals", force: true do |t|
     t.integer  "order"
     t.integer  "distance_in_meters"
-    t.string   "time",               limit: nil
-    t.string   "rest",               limit: nil
+    t.string   "time"
+    t.string   "rest"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "speed_workout_id"
