@@ -19,8 +19,8 @@ module SessionsHelper
 
   def forget(user)
     user.forget
-    cookies.signed[:user_id] = nil
-    cookies[:remember_token] = nil
+    cookies.delete(:user_id)
+    cookies.delete(:remember_token)
   end
 
   # Returns the current logged-in user if present, or
