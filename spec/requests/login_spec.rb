@@ -51,6 +51,28 @@ RSpec.describe "Login", :type => :request do
       assert_select "a[href=?]", login_path, count: 0
       assert_select "a[href=?]", logout_path, count: 1
     end
+
+    it "should remember the user if checkbox checked" do
+      get login_path
+      post login_path, session: {
+          email: email,
+          password: password,
+          remember_me: 1
+        }
+      # using string instead of symbol because
+      # cookies with symbol keys always returns nil in tests
+      expect(cookies['remember_token']).to_not be_nil
+    end
+
+    it "should forget the user if checkbox unchecked" do
+      get login_path
+      post login_path, session: {
+          email: email,
+          password: password,
+          remember_me: 0
+        }
+      expect(cookies['remember_token']).to be_nil
+    end
   end
 
   describe "DELETE /logout" do
