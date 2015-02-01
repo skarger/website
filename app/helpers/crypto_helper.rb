@@ -10,7 +10,7 @@ module CryptoHelper
   end
 
   def token_matches?(unencrypted, encrypted)
-    return if encrypted.nil?
+    return false if encrypted.nil?
     BCrypt::Password.new(encrypted).is_password?(unencrypted)
   end
 end

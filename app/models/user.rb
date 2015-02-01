@@ -13,11 +13,11 @@ class User < ActiveRecord::Base
   end
 
   def forget
-    update_attribute(:remember_digest, nil)
     self.remember_token = nil
+    update_attribute(:remember_digest, nil)
   end
 
-  def authenticated?(remember_token)
-    token_matches?(remember_token, remember_digest)
+  def authenticated?(token)
+    token_matches?(token, remember_digest)
   end
 end
