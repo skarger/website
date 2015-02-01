@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
   end
 
   def authenticated?(token)
-    token_matches?(token, remember_digest)
+    return false if token.nil?
+    token_matches?(remember_digest, token)
   end
 end

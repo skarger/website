@@ -29,13 +29,13 @@ RSpec.describe SessionsHelper, :type => :helper do
     describe '#token_matches?'
     it 'should return true when given the correct token' do
       encrypted_token = helper.digest(input_string)
-      expect(helper.token_matches?(input_string, encrypted_token)).
+      expect(helper.token_matches?(encrypted_token, input_string)).
         to be_truthy
     end
 
     it 'should return false when given an invalid token' do
       encrypted_token = helper.digest(input_string)
-      expect(helper.token_matches?('wrong value', encrypted_token)).
+      expect(helper.token_matches?(encrypted_token, 'wrong value')).
         to be_falsey
     end
   end

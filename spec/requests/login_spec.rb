@@ -62,5 +62,18 @@ RSpec.describe "Login", :type => :request do
       follow_redirect!
       assert_template 'welcome/index'
     end
+
+    it "should only execute full log out logic once" do
+      get login_path
+      post login_path, session: { email: email, password: password }
+      follow_redirect!
+      delete logout_path
+      # Simulate a user clicking logout in a second window.
+      delete logout_path
+      follow_redirect!
+      assert_select "a[href=?]", login_path, count: 1
+      assert_select "a[href=?]", logout_path, count: 0
+    end
+
   end
 end

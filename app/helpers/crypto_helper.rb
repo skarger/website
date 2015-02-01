@@ -9,8 +9,7 @@ module CryptoHelper
     SecureRandom.urlsafe_base64
   end
 
-  def token_matches?(unencrypted, encrypted)
-    return false if encrypted.nil?
+  def token_matches?(encrypted, unencrypted)
     BCrypt::Password.new(encrypted).is_password?(unencrypted)
   end
 end
