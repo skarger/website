@@ -11,5 +11,23 @@ require 'rails_helper'
 #   end
 # end
 RSpec.describe SessionsHelper, :type => :helper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe '#remember' do
+    let!(:user) {User.create(email: 'test@test.com', password: 'secret')}
+
+    it 'should cause the user to have a remember_digest' do
+      expect{ helper.remember(user) }.to change{user.remember_digest}
+    end
+
+    it 'should set cookies.permanent.signed[:user_id]' do
+      cookies.permanent.signed[:user_id] = nil
+      helper.remember(user)
+      expect(cookies.permanent.signed[:user_id]).to eq(user.id)
+    end
+
+    it 'should set cookies.permanent[:remember_token]' do
+      cookies.permanent[:remember_token] = nil
+      helper.remember(user)
+      expect(cookies.permanent[:remember_token]).to eq(user.remember_token)
+    end
+  end
 end

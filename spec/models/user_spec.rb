@@ -29,6 +29,21 @@ RSpec.describe User, :type => :model do
       user.remember
       expect(user.remember_digest).to_not be_nil
     end
+
+  end
+
+  describe '#forget' do
+    it 'should clear the remember_digest' do
+      user.remember
+      user.forget
+      expect(user.remember_digest).to be_nil
+    end
+
+    it 'should clear the remember_token' do
+      user.remember
+      user.forget
+      expect(user.remember_token).to be_nil
+    end
   end
 
   describe '#authenticated?' do
@@ -36,6 +51,13 @@ RSpec.describe User, :type => :model do
       user.remember
       expect(user.authenticated?(user.remember_token)).
         to be_truthy
+    end
+
+    it 'should not match the remember_token to the digest after forget' do
+      user.remember
+      user.forget
+      expect(user.authenticated?(user.remember_token)).
+        to be_falsey
     end
 
     it 'should not match an invalid remember token' do
