@@ -5,6 +5,7 @@ module SessionsHelper
 
   # Logs out the current user.
   def log_out
+    forget(current_user)
     session.delete(:user_id)
     @current_user = nil
   end
@@ -17,6 +18,7 @@ module SessionsHelper
   end
 
   def forget(user)
+    user.forget
     cookies.signed[:user_id] = nil
     cookies[:remember_token] = nil
   end
