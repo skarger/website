@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150201004618) do
+ActiveRecord::Schema.define(version: 20150207041239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20150201004618) do
   create_table "run_intervals", force: true do |t|
     t.integer  "order"
     t.integer  "distance_in_meters"
-    t.string   "time"
-    t.string   "rest"
+    t.string   "time",               limit: nil
+    t.string   "rest",               limit: nil
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "speed_workout_id"
@@ -44,6 +44,9 @@ ActiveRecord::Schema.define(version: 20150201004618) do
     t.datetime "updated_at"
     t.string   "notes"
     t.string   "type"
+    t.integer  "user_id"
   end
+
+  add_index "workouts", ["user_id"], name: "index_workouts_on_user_id", using: :btree
 
 end

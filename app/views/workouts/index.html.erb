@@ -1,5 +1,9 @@
 <h1>Listing workouts</h1>
 
+<% if logged_in? %>
+    <h2><%= link_to 'Add new workout', new_workout_path %></h2>
+<% end %>
+
 <table>
   <tr>
     <th></th>
@@ -13,5 +17,6 @@
   </tr>
 <% end %>
 </table>
+
 
 <br />

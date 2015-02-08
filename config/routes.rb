@@ -56,7 +56,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:new, :create, :show]
 
-  resources :workouts, only: [:index, :show, :update]
+  resources :workouts, only: [:index, :show, :update, :new, :create]
 
   get '/login', to: 'sessions#new'
   post '/login', to: 'sessions#create'

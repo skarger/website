@@ -1,4 +1,5 @@
 class WorkoutsController < ApplicationController
+  before_action :require_login, only: [:new, :create]
   # GET /workouts
   # GET /workouts.json
   def index
@@ -85,4 +86,10 @@ class WorkoutsController < ApplicationController
   def workout_params
     params.require(:workout).permit(:where)
   end
+
+  def require_login
+    unless logged_in?
+      redirect_to login_path
+  end
+end
 end
