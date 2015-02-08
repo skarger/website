@@ -12,6 +12,26 @@
   <% end %>
 
   <div class="actions">
+    <p>
+    <%= f.label :where %>
+    <%= f.text_field :where, :size => "50" %>
+    </p>
+
+    <p>
+    <%= f.label :when %>
+    <%= date_select :workout, :when %>
+    </p>
+
+    <p>
+    <%= f.label :type %>
+    <%= select :workout, :type, [['Speed Workout', 'SpeedWorkout']] %>
+    </p>
+
+    <p>
+    <%= f.label :notes %>
+    <%= f.text_area :notes, size: "60x12" %>
+    </p>
+
     <%= f.submit %>
   </div>
 <% end %>
