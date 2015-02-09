@@ -1,5 +1,6 @@
 class WorkoutsController < ApplicationController
   before_action :require_login, only: [:new, :create]
+
   # GET /workouts
   # GET /workouts.json
   def index
@@ -41,11 +42,12 @@ class WorkoutsController < ApplicationController
   # POST /workouts
   # POST /workouts.json
   def create
-    @workout = Workout.new(params[:workout])
+    @workout = Workout.new(workout_params)
+    @workout.user = current_user
 
     respond_to do |format|
       if @workout.save
-        format.html { redirect_to @workout, notice: 'Workout was successfully created.' }
+        format.html { redirect_to workout_url(@workout), notice: 'Workout was successfully created.' }
         format.json { render json: @workout, status: :created, location: @workout }
       else
         format.html { render action: "new" }
@@ -84,7 +86,7 @@ class WorkoutsController < ApplicationController
 
   private
   def workout_params
-    params.require(:workout).permit(:where)
+    params.require(:workout).permit(:where, :when, :type, :notes)
   end
 
   def require_login
