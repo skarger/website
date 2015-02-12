@@ -1,0 +1,2 @@
+module RunIntervalsHelper
+end

@@ -4,3 +4,7 @@
 <%= link_to 'Back', workouts_path %>
 
 <%= render @workout %>
+
+<p>
+<%= link_to 'Add run interval', new_workout_run_interval_path(@workout) %>
+</p>

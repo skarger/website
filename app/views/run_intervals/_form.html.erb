@@ -1,0 +1,18 @@
+<%= form_for([@workout, @run_interval], url: workout_run_intervals_path) do |f| %>
+  <% if @run_interval.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@run_interval.errors.count, "error") %> prohibited this run interval from being saved:</h2>
+
+      <ul>
+      <% @run_interval.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions">
+
+    <%= f.submit %>
+  </div>
+<% end %>
