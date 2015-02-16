@@ -16,3 +16,9 @@
   </tr>
 <% end %>
 </table>
+
+<% if logged_in? && @workout.user == current_user %>
+<p>
+<%= link_to 'Add run interval', new_workout_run_interval_path(@workout) %>
+</p>
+<% end %>

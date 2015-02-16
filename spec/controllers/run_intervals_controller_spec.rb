@@ -19,7 +19,8 @@ RSpec.describe RunIntervalsController, :type => :controller do
     context 'when the logged in user does not own the workout' do
       it 'should return not found' do
         allow(subject).to receive(:logged_in?).and_return(true)
-        allow(subject).to receive(:current_user).and_return(User.new(id: 2))
+        logged_in_user = User.new(id: 2)
+        allow(subject).to receive(:current_user).and_return(logged_in_user)
         get :new, workout_id: workout.id
         expect(response.code).to eq("404")
       end
