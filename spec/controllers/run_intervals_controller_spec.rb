@@ -94,18 +94,37 @@ RSpec.describe RunIntervalsController, :type => :controller do
         allow(subject).to receive(:logged_in?).and_return(true)
         allow(subject).to receive(:current_user).and_return(user)
         allow(Workout).to receive(:find).and_return(workout)
-        allow(RunInterval).to receive(:new).and_return(run_interval)
       end
 
-      it 'should redirect to the workout' do
-        post :create, workout_id: workout.id
-        expect(response).to redirect_to(workout_path(workout))
+      it "should require a run_interval" do
+        expect{ post :create, workout_id: workout.id }.to raise_error ActionController::ParameterMissing
+      end
+
+      it "should permit valid run interval attributes" do
+        valid_run_interval = RunInterval.new(order: 1, distance_in_meters: 200, time: 35, rest: 90)
+        post :create, workout_id: workout.id, run_interval: valid_run_interval.as_json
+        expect(response.code).to eq("302")
+      end
+
+      it "should not permit invalid run interval attributes" do
+        # user should not be able to set id of created run interval object
+        invalid_attributes = { id: -1 }
+        post :create, workout_id: workout.id, run_interval: invalid_attributes
+        interval_ids = Workout.find(workout.id).run_intervals.map(&:id)
+        expect(interval_ids).to_not include(-1)
       end
 
       it "should set the created run interval's workout to the workout" do
-        post :create, workout_id: workout.id
+        allow(RunInterval).to receive(:new).and_return(run_interval)
+        post :create, workout_id: workout.id, run_interval: run_interval.as_json
         expect(run_interval.speed_workout_id).to eql(workout.id)
       end
+
+      it 'should redirect to the workout' do
+        post :create, workout_id: workout.id, run_interval: run_interval.as_json
+        expect(response).to redirect_to(workout_path(workout))
+      end
+
     end
   end
 end

@@ -3,8 +3,8 @@ class RunIntervalsController < ApplicationController
 
   def new
     @run_interval = RunInterval.new
-    @speed_workout = Workout.find(params[:workout_id])
-    @run_interval.speed_workout = @speed_workout
+    @workout = Workout.find(params[:workout_id])
+    @run_interval.speed_workout = @workout
 
     respond_to do |format|
       format.html # new.html.erb
@@ -13,7 +13,7 @@ class RunIntervalsController < ApplicationController
   end
 
   def create
-    @run_interval = RunInterval.new
+    @run_interval = RunInterval.new(run_interval_params)
 
     @speed_workout = SpeedWorkout.find(params["workout_id"])
     @run_interval.speed_workout = @speed_workout
@@ -26,6 +26,10 @@ class RunIntervalsController < ApplicationController
   end
 
   private
+  def run_interval_params
+    params.require(:run_interval).permit(:order, :distance_in_meters, :time, :rest)
+  end
+
   def require_login
     if logged_in?
       associated_workout = Workout.find(params[:workout_id])

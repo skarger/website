@@ -17,3 +17,5 @@
 
 .DS_Store
 
+# Ignore vim backup files
+*.swp
