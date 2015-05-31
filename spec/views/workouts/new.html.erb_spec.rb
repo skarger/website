@@ -42,6 +42,13 @@ RSpec.describe "workouts/new", :type => :view do
     expect(rendered).to match /Type/
   end
 
+  it "should have choices for the workout type" do
+    render
+    given_options = assert_select("select#workout_type option")
+    given_values = given_options.collect { |option| option["value"] }
+    expect(given_values).to match_array(["SpeedWorkout", "DistanceRun"])
+  end
+
   it "should have an input for notes" do
     render
     expect(rendered).to match /Notes/

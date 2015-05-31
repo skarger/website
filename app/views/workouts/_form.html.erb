@@ -24,7 +24,9 @@
 
     <p>
     <%= f.label :type %>
-    <%= select :workout, :type, [['Speed Workout', 'SpeedWorkout']] %>
+    <%= select :workout, :type, [
+      ['Speed Workout', 'SpeedWorkout'], ['Distance Run', 'DistanceRun']
+      ] %>
     </p>
 
     <p>
