@@ -13,6 +13,30 @@ RSpec.describe "workouts/new", :type => :view do
     expect(rendered).to match /When/
   end
 
+  context "when the date differs between US/Eastern and UTC" do
+    it "should show the US/Eastern version for the default workout date" do
+      may31_eastern_june1_utc = Time.new(2015, 5, 31, 23, 0, 0, "-04:00")
+      allow(Time).to receive(:now).and_return(may31_eastern_june1_utc)
+      @workout = Workout.new
+      render
+      day = assert_select("select#workout_when_3i option[selected]").
+        first['value']
+      expect(day).to eq("31")
+    end
+  end
+
+  context "when the date differs between US/Eastern and US/Central" do
+    it "should show the US/Eastern version for the default workout date" do
+      may31_central_june1_eastern = Time.new(2015, 5, 31, 23, 0, 0, "-05:00")
+      allow(Time).to receive(:now).and_return(may31_central_june1_eastern)
+      @workout = Workout.new
+      render
+      day = assert_select("select#workout_when_3i option[selected]").
+        first['value']
+      expect(day).to eq("1")
+    end
+  end
+
   it "should have an input for the workout type" do
     @workout = Workout.new
     render

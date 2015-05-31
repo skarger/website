@@ -19,7 +19,7 @@
 
     <p>
     <%= f.label :when %>
-    <%= date_select :workout, :when %>
+    <%= date_select :workout, :when, default: Time.now.in_time_zone('US/Eastern') %>
     </p>
 
     <p>
