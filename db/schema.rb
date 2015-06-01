@@ -11,22 +11,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150207041239) do
+ActiveRecord::Schema.define(version: 20150601015938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "run_intervals", force: true do |t|
+  create_table "distance_runs", force: :cascade do |t|
+    t.decimal  "distance_in_miles"
+    t.string   "time"
+    t.integer  "distance_workout_id"
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
+  end
+
+  add_index "distance_runs", ["distance_workout_id"], name: "index_distance_runs_on_distance_workout_id", using: :btree
+
+  create_table "run_intervals", force: :cascade do |t|
     t.integer  "order"
     t.integer  "distance_in_meters"
-    t.string   "time",               limit: nil
-    t.string   "rest",               limit: nil
+    t.string   "time"
+    t.string   "rest"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "speed_workout_id"
   end
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "email"
     t.string   "password_digest"
     t.datetime "created_at"
@@ -37,7 +47,7 @@ ActiveRecord::Schema.define(version: 20150207041239) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
 
-  create_table "workouts", force: true do |t|
+  create_table "workouts", force: :cascade do |t|
     t.datetime "when"
     t.string   "where"
     t.datetime "created_at"
@@ -49,4 +59,5 @@ ActiveRecord::Schema.define(version: 20150207041239) do
 
   add_index "workouts", ["user_id"], name: "index_workouts_on_user_id", using: :btree
 
+  add_foreign_key "distance_runs", "workouts", column: "distance_workout_id", on_delete: :cascade
 end
