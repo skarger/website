@@ -45,4 +45,23 @@ RSpec.describe "workouts/show", :type => :view do
 
   end
 
+  context "when the workout is a Distance Workout" do
+    it "should render a page customized to a Distance Workout" do
+      workout = Workout.new(id: 2, type: 'DistanceWorkout',
+        when: DateTime.now)
+      assign(:workout, workout)
+      render
+      expect(rendered).to match /Distance Workout/
+    end
+
+    it "should show the date" do
+      today = DateTime.now
+      workout = Workout.new(id: 2, type: 'DistanceWorkout',
+        when: today)
+      assign(:workout, workout)
+      render
+      expect(rendered).to match /Distance Workout | #{today.strftime('%b %d %Y')}/
+    end
+  end
+
 end
