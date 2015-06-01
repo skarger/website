@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "Login", :type => :request do
+  def document_root_element
+    html_document.root
+  end
+
   let(:email) {'test@test.com' }
   let(:password) {'secret'}
   let!(:user) {User.create({email: email, password: password})}
