@@ -19,7 +19,7 @@ RSpec.describe UsersController, :type => :controller do
     it 'should show a user' do
       u = User.new(name: "Test User")
       allow(User).to receive(:find).and_return(u)
-      get :show, id: 1
+      get :show, params: { id: 1 }
       expect(response.status).to eq(200)
     end
   end

@@ -35,12 +35,12 @@ RSpec.describe WorkoutsController, :type => :controller do
       it 'should redirect to the new workout' do
         allow(Workout).to receive(:new).and_return(workout)
 
-        post :create, workout: { where: "Gym"}
+        post :create, params: { workout: { where: "Gym"} }
         expect(response).to redirect_to(workout_path(workout))
       end
 
       it 'should set the workout user to currently logged in user' do
-        post :create, workout: { where: "Gym"}
+        post :create, params: { workout: { where: "Gym"} }
         expect(workout.user).to eql(user)
       end
     end
