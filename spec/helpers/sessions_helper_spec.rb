@@ -24,37 +24,6 @@ RSpec.describe SessionsHelper, :type => :helper do
         expect(current_user).to eq(user)
       end
     end
-
-    context 'session is nil'
-      before(:each) do
-        session[:user_id] = nil
-      end
-      it 'should return the remembered user' do
-        expect(current_user).to eq(user)
-      end
-
-      it 'should return nil when given token is wrong' do
-        cookies['remember_token'] = 'fake'
-        expect(current_user).to be_nil
-      end
-  end
-
-  describe '#remember' do
-    it 'should cause the user to have a remember_digest' do
-      expect{ helper.remember(user) }.to change{user.remember_digest}
-    end
-
-    it 'should set cookies.permanent.signed[:user_id]' do
-      cookies.permanent.signed[:user_id] = nil
-      helper.remember(user)
-      expect(cookies.permanent.signed[:user_id]).to eq(user.id)
-    end
-
-    it 'should set cookies.permanent[:remember_token]' do
-      cookies.permanent[:remember_token] = nil
-      helper.remember(user)
-      expect(cookies.permanent[:remember_token]).to eq(user.remember_token)
-    end
   end
 
   describe '#forget' do
