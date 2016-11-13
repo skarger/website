@@ -5,9 +5,9 @@ RSpec.describe "workouts/new", :type => :view do
     @workout = Workout.new
   end
 
-  it "should have an input for where the workout occurred" do
+  it "should have an input for the name of the workout" do
     render
-    expect(rendered).to match /Where/
+    expect(rendered).to match /Name/
   end
 
   it "should have an input for when the workout occurred" do
