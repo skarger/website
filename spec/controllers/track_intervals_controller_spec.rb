@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe RunIntervalsController, :type => :controller do
+RSpec.describe TrackIntervalsController, :type => :controller do
   describe '#new' do
     let(:user) { User.new(id: 1) }
     let(:workout) { TrackWorkout.new(id: 1, user_id: user.id) }
@@ -49,10 +49,10 @@ RSpec.describe RunIntervalsController, :type => :controller do
       end
 
       it 'should have the correct workout id set' do
-        run_interval = RunInterval.new
-        allow(RunInterval).to receive(:new).and_return(run_interval)
+        track_interval = TrackInterval.new
+        allow(TrackInterval).to receive(:new).and_return(track_interval)
         get :new, params: { workout_id: workout.id }
-        expect(run_interval.track_workout_id).to eq(workout.id)
+        expect(track_interval.track_workout_id).to eq(workout.id)
       end
     end
   end
@@ -88,7 +88,7 @@ RSpec.describe RunIntervalsController, :type => :controller do
     end
 
     context 'when the user is logged in and owns the workout' do
-      let(:run_interval) { RunInterval.new }
+      let(:track_interval) { TrackInterval.new }
 
       before(:each) do
         allow(subject).to receive(:logged_in?).and_return(true)
@@ -96,32 +96,32 @@ RSpec.describe RunIntervalsController, :type => :controller do
         allow(Workout).to receive(:find).and_return(workout)
       end
 
-      it "should require a run_interval" do
+      it "should require a track_interval" do
         expect{ post :create, params: { workout_id: workout.id } }.to raise_error ActionController::ParameterMissing
       end
 
-      it "should permit valid run interval attributes" do
-        valid_run_interval = RunInterval.new(order: 1, distance_in_meters: 200, time: 35, rest: 90)
-        post :create, params: { workout_id: workout.id, run_interval: valid_run_interval.as_json }
+      it "should permit valid track interval attributes" do
+        valid_track_interval = TrackInterval.new(order: 1, distance_in_meters: 200, time: 35, rest: 90)
+        post :create, params: { workout_id: workout.id, track_interval: valid_track_interval.as_json }
         expect(response.code).to eq("302")
       end
 
-      it "should not permit invalid run interval attributes" do
-        # user should not be able to set id of created run interval object
+      it "should not permit invalid track interval attributes" do
+        # user should not be able to set id of created track interval object
         invalid_attributes = { id: -1 }
-        post :create, params: { workout_id: workout.id, run_interval: invalid_attributes }
-        interval_ids = Workout.find(workout.id).run_intervals.map(&:id)
+        post :create, params: { workout_id: workout.id, track_interval: invalid_attributes }
+        interval_ids = Workout.find(workout.id).track_intervals.map(&:id)
         expect(interval_ids).to_not include(-1)
       end
 
-      it "should set the created run interval's workout to the workout" do
-        allow(RunInterval).to receive(:new).and_return(run_interval)
-        post :create, params: { workout_id: workout.id, run_interval: run_interval.as_json }
-        expect(run_interval.track_workout_id).to eql(workout.id)
+      it "should set the created track interval's workout to the workout" do
+        allow(TrackInterval).to receive(:new).and_return(track_interval)
+        post :create, params: { workout_id: workout.id, track_interval: track_interval.as_json }
+        expect(track_interval.track_workout_id).to eql(workout.id)
       end
 
       it 'should redirect to the workout' do
-        post :create, params: { workout_id: workout.id, run_interval: run_interval.as_json }
+        post :create, params: { workout_id: workout.id, track_interval: track_interval.as_json }
         expect(response).to redirect_to(workout_path(workout))
       end
 

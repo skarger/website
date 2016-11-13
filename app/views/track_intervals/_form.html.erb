@@ -1,10 +1,10 @@
-<%= form_for([@workout, @run_interval], url: workout_run_intervals_path(@workout)) do |f| %>
-  <% if @run_interval.errors.any? %>
+<%= form_for([@workout, @track_interval], url: workout_track_intervals_path(@workout)) do |f| %>
+  <% if @track_interval.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@run_interval.errors.count, "error") %> prohibited this run interval from being saved:</h2>
+      <h2><%= pluralize(@track_interval.errors.count, "error") %> prohibited this track interval from being saved:</h2>
 
       <ul>
-      <% @run_interval.errors.full_messages.each do |msg| %>
+      <% @track_interval.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>

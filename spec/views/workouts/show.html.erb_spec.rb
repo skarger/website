@@ -18,28 +18,28 @@ RSpec.describe "workouts/show", :type => :view do
         allow(view).to receive(:logged_in?).and_return(false)
       end
 
-      it "should not have a link to add a run interval" do
+      it "should not have a link to add a track interval" do
       render
-      expect(rendered).not_to match /Add run interval/
+      expect(rendered).not_to match /Add track interval/
       end
     end
 
     context 'when the user is logged in but does not own the workout' do
-      it "should should have a link to add a run interval" do
+      it "should should have a link to add a track interval" do
         allow(view).to receive(:logged_in?).and_return(true)
         allow(view).to receive(:current_user).and_return(User.new)
         render
-        expect(rendered).not_to match /Add run interval/
+        expect(rendered).not_to match /Add track interval/
       end
     end
 
 
     context 'when the user is logged in and owns the workout' do
-      it "should have a link to add a run interval" do
+      it "should have a link to add a track interval" do
         allow(view).to receive(:logged_in?).and_return(true)
         allow(view).to receive(:current_user).and_return(user)
         render
-        expect(rendered).to match /Add run interval/
+        expect(rendered).to match /Add track interval/
       end
     end
 

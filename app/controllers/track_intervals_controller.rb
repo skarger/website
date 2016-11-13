@@ -1,33 +1,33 @@
-class RunIntervalsController < ApplicationController
+class TrackIntervalsController < ApplicationController
   before_action :require_login, except: [:index, :show]
 
   def new
-    @run_interval = RunInterval.new
+    @track_interval = TrackInterval.new
     @workout = Workout.find(params[:workout_id])
-    @run_interval.track_workout = @workout
+    @track_interval.track_workout = @workout
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @run_interval }
+      format.json { render json: @track_interval }
     end
   end
 
   def create
-    @run_interval = RunInterval.new(run_interval_params)
+    @track_interval = TrackInterval.new(track_interval_params)
 
     @track_workout = TrackWorkout.find(params["workout_id"])
-    @run_interval.track_workout = @track_workout
+    @track_interval.track_workout = @track_workout
 
     respond_to do |format|
-      if @run_interval.save
-        format.html { redirect_to workout_url(@track_workout), notice: 'Run Interval was successfully created.' }
+      if @track_interval.save
+        format.html { redirect_to workout_url(@track_workout), notice: 'Track Interval was successfully created.' }
       end
     end
   end
 
   private
-  def run_interval_params
-    params.require(:run_interval).permit(:order, :distance_in_meters, :time, :rest)
+  def track_interval_params
+    params.require(:track_interval).permit(:order, :distance_in_meters, :time, :rest)
   end
 
   def require_login

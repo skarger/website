@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe "run_intervals/new", :type => :view do
+RSpec.describe "track_intervals/new", :type => :view do
 
   before(:each) do
     workout = TrackWorkout.new(id: 1)
-    run_interval = RunInterval.new(track_workout_id: workout.id)
+    track_interval = TrackInterval.new(track_workout_id: workout.id)
     assign(:workout, workout)
-    assign(:run_interval, run_interval)
+    assign(:track_interval, track_interval)
   end
 
   it 'should have an input for the order of the interval' do

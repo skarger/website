@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   resources :users, only: [:new, :create, :show]
 
   resources :workouts, only: [:index, :show, :update, :new, :create] do
-    resources :run_intervals, only: [:new, :create]
+    resources :track_intervals, only: [:new, :create]
   end
 
   get '/login', to: 'sessions#new'
