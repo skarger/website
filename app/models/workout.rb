@@ -1,3 +1,3 @@
-class Workout < ActiveRecord::Base
+class Workout < ApplicationRecord
   belongs_to :user
 end
