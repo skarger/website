@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "workouts/show", :type => :view do
-  context 'when the workout is a Speed Workout' do
+  context 'when the workout is a Track Workout' do
 
     let(:user) { User.new }
     let(:workout) {
-      Workout.new(id: 1, type: 'SpeedWorkout',
+      Workout.new(id: 1, type: 'TrackWorkout',
         when: DateTime.now, user: user)
     }
 

@@ -1,5 +1,5 @@
-<h1><%= speed_workout.where %> | <%= speed_workout.when.strftime('%b %d %Y') %></h1>
-<h2>Speed Workout</h2>
+<h1><%= track_workout.where %> | <%= track_workout.when.strftime('%b %d %Y') %></h1>
+<h2>Track Workout</h2>
 
 <table>
 <th>
@@ -8,7 +8,7 @@
         <th>Time</th>
         <th>Rest</th>
     </tr>
-<% speed_workout.run_intervals.each do |ri| %>
+<% track_workout.run_intervals.each do |ri| %>
   <tr>
     <td><%= ri.distance_in_meters %></td>
     <td><%= ri.time %></td>

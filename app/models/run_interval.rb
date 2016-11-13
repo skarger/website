@@ -1,3 +1,3 @@
 class RunInterval < ApplicationRecord
-  belongs_to :speed_workout
+  belongs_to :track_workout
 end

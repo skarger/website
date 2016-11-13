@@ -4,7 +4,7 @@ class RunIntervalsController < ApplicationController
   def new
     @run_interval = RunInterval.new
     @workout = Workout.find(params[:workout_id])
-    @run_interval.speed_workout = @workout
+    @run_interval.track_workout = @workout
 
     respond_to do |format|
       format.html # new.html.erb
@@ -15,12 +15,12 @@ class RunIntervalsController < ApplicationController
   def create
     @run_interval = RunInterval.new(run_interval_params)
 
-    @speed_workout = SpeedWorkout.find(params["workout_id"])
-    @run_interval.speed_workout = @speed_workout
+    @track_workout = TrackWorkout.find(params["workout_id"])
+    @run_interval.track_workout = @track_workout
 
     respond_to do |format|
       if @run_interval.save
-        format.html { redirect_to workout_url(@speed_workout), notice: 'Run Interval was successfully created.' }
+        format.html { redirect_to workout_url(@track_workout), notice: 'Run Interval was successfully created.' }
       end
     end
   end

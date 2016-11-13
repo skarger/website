@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe RunIntervalsController, :type => :controller do
   describe '#new' do
     let(:user) { User.new(id: 1) }
-    let(:workout) { SpeedWorkout.new(id: 1, user_id: user.id) }
+    let(:workout) { TrackWorkout.new(id: 1, user_id: user.id) }
 
     before(:each) do
       allow(Workout).to receive(:find).and_return(workout)
@@ -52,14 +52,14 @@ RSpec.describe RunIntervalsController, :type => :controller do
         run_interval = RunInterval.new
         allow(RunInterval).to receive(:new).and_return(run_interval)
         get :new, params: { workout_id: workout.id }
-        expect(run_interval.speed_workout_id).to eq(workout.id)
+        expect(run_interval.track_workout_id).to eq(workout.id)
       end
     end
   end
 
   describe '#create' do
     let(:user) { User.new(id: 1) }
-    let(:workout) { SpeedWorkout.new(id: 1, user_id: user.id) }
+    let(:workout) { TrackWorkout.new(id: 1, user_id: user.id) }
 
     it 'should redirect to login if the user is not logged in' do
       post :create, params: { workout_id: workout.id }
@@ -117,7 +117,7 @@ RSpec.describe RunIntervalsController, :type => :controller do
       it "should set the created run interval's workout to the workout" do
         allow(RunInterval).to receive(:new).and_return(run_interval)
         post :create, params: { workout_id: workout.id, run_interval: run_interval.as_json }
-        expect(run_interval.speed_workout_id).to eql(workout.id)
+        expect(run_interval.track_workout_id).to eql(workout.id)
       end
 
       it 'should redirect to the workout' do
