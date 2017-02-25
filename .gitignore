@@ -19,3 +19,5 @@
 
 # Ignore vim backup files
 *.swp
+
+**/elm-stuff
