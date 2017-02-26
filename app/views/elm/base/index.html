@@ -1,3 +1,4 @@
+
 <div class="wrapper">
   <div class="header">
     <h1>Elm Package Demos</h2>
@@ -13,10 +14,31 @@
     </ul>
   </div>
   <div class="content">
+  <div  class="code-block">
+  <pre><code><span class="code-block">type Score
+    = Touchdown
+    | FieldGoal
+
+
+points : Score -> Int
+points s =
+    case s of
+        Touchdown ->
+            6
+
+        FieldGoal ->
+            3
+
+
+reaction : Score -> String
+reaction =
+    always "OH YEAH!"</span></code></pre>
+    </div>
     <div id="main"></div>
   </div>
 </div>
 
+<script>hljs.initHighlightingOnLoad();</script>
 <script>
   var node = document.getElementById('main');
   var app = Elm.Main.embed(node);

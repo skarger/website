@@ -5,6 +5,14 @@
   grid-template-rows: 10% 90%;
 }
 
+div.code-block {
+  width: 50%;
+}
+
+span.code-block {
+  font-size: large;
+}
+
 .header {
   grid-column: 1 / 3;
   text-align: center;
