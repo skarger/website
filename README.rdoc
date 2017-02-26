@@ -16,10 +16,22 @@ Things you may want to cover:
 * Database initialization
 
 * How to run the test suite
+```
+rspec
+```
 
 * Services (job queues, cache servers, search engines, etc.)
 
 * Deployment instructions
+
+For Elm:
+
+```
+cd app/elm
+elm make Main.elm --output ../assets/javascripts/elm/base.js
+```
+
+git push heroku-cedar-14 master
 
 * ...
 
