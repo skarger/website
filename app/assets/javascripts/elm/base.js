@@ -8261,53 +8261,6 @@ var _user$project$Main$update = F2(
 		}
 	});
 var _user$project$Main$model = 0;
-var _user$project$Main$roundRect = A2(
-	_elm_lang$svg$Svg$svg,
-	{
-		ctor: '::',
-		_0: _elm_lang$svg$Svg_Attributes$width('120'),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$height('120'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$viewBox('0 0 120 120'),
-				_1: {ctor: '[]'}
-			}
-		}
-	},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$svg$Svg$rect,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$x('10'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$y('10'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$width('100'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$height('100'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$rx('15'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$ry('15'),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			},
-			{ctor: '[]'}),
-		_1: {ctor: '[]'}
-	});
 var _user$project$Main$Decrement = {ctor: 'Decrement'};
 var _user$project$Main$Increment = {ctor: 'Increment'};
 var _user$project$Main$view = function (model) {
@@ -8353,18 +8306,7 @@ var _user$project$Main$view = function (model) {
 							_0: _elm_lang$html$Html$text('+'),
 							_1: {ctor: '[]'}
 						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _user$project$Main$roundRect,
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
+					_1: {ctor: '[]'}
 				}
 			}
 		});

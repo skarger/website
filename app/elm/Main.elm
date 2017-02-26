@@ -6,13 +6,6 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
 
-roundRect : Html.Html msg
-roundRect =
-    svg
-        [ width "120", height "120", viewBox "0 0 120 120" ]
-        [ rect [ x "10", y "10", width "100", height "100", rx "15", ry "15" ] [] ]
-
-
 main =
     Html.beginnerProgram { model = model, view = view, update = update }
 
@@ -59,5 +52,4 @@ view model =
         [ button [ onClick Decrement ] [ Html.text "-" ]
         , div [] [ Html.text (toString model) ]
         , button [ onClick Increment ] [ Html.text "+" ]
-        , div [] [ roundRect ]
         ]

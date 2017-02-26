@@ -1,4 +1,22 @@
-<div id="main"></div>
+<div class="wrapper">
+  <div class="header">
+    <h1>Elm Package Demos</h2>
+  </div>
+  <div class="sidebar">
+    <ul class="package-list">
+      <li>
+        Core
+        <ul class="module-list">
+          <li>Basics</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <div class="content">
+    <div id="main"></div>
+  </div>
+</div>
+
 <script>
   var node = document.getElementById('main');
   var app = Elm.Main.embed(node);
