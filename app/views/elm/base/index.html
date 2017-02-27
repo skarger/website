@@ -9,6 +9,11 @@
         Core
         <ul class="module-list">
           <li>Basics</li>
+          <li>
+            <ul class="function-list">
+              <li>always</li>
+            </ul>
+          </li>
         </ul>
       </li>
     </ul>
@@ -17,6 +22,7 @@
   <div  class="code-block">
   <pre><code><span class="code-block">type Score
     = Touchdown
+    | ExtraPoint
     | FieldGoal
 
 
@@ -25,6 +31,9 @@ points s =
     case s of
         Touchdown ->
             6
+
+        ExtraPoint ->
+            1
 
         FieldGoal ->
             3
