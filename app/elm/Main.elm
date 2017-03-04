@@ -3,9 +3,13 @@ module Main exposing (..)
 import Html
     exposing
         ( Html
+        , h1
         , button
         , div
+        , span
         , text
+        , pre
+        , code
         , a
         , ul
         , li
@@ -16,9 +20,10 @@ import Html
         , tr
         , td
         )
-import Html.Attributes exposing (class, href, attribute)
+import Html.Attributes exposing (id, class, href, attribute)
 import Html.Events exposing (onClick)
 import Navigation
+import Ports
 
 
 main =
@@ -32,7 +37,7 @@ main =
 
 init : Navigation.Location -> ( Model, Cmd msg )
 init location =
-    ( Model [ location ] [], Cmd.none )
+    ( Model [ location ] [], Ports.highlightCode Nothing )
 
 
 
@@ -136,20 +141,79 @@ reactionItem score =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ class "demo", onClick Reset ] [ text "Reset" ]
-        , button [ class "demo", onClick AddTouchdown ] [ text "Touchdown" ]
-        , button [ class "demo", onClick AddExtraPoint ] [ text "Extra Point" ]
-        , button [ class "demo", onClick AddFieldGoal ] [ text "Field Goal" ]
-        , table []
-            [ thead []
-                [ th [] [ text "Points" ]
-                , th [] [ text "Reaction" ]
-                ]
-            , tbody [] (List.map row model.scores)
+    div [ id "main-grid" ]
+        [ div [ class "header" ]
+            [ h1 [] [ text "Elm Package Demos" ]
             ]
-        , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-        , ul [] (List.map viewLocation model.history)
+        , div [ class "sidebar" ]
+            [ ul [ class "package-list" ]
+                [ li []
+                    [ text "Core"
+                    , ul [ class "module-list" ]
+                        [ li []
+                            [ text "Basics"
+                            , li
+                                []
+                                [ ul [ class "function-list" ]
+                                    [ li [] [ text "always" ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        , div [ class "content" ]
+            [ viewCode
+            ]
+        , div [ class "right-content" ]
+            [ button [ class "demo", onClick Reset ] [ text "Reset" ]
+            , button [ class "demo", onClick AddTouchdown ] [ text "Touchdown" ]
+            , button [ class "demo", onClick AddExtraPoint ] [ text "Extra Point" ]
+            , button [ class "demo", onClick AddFieldGoal ] [ text "Field Goal" ]
+            , table []
+                [ thead []
+                    [ th [] [ text "Points" ]
+                    , th [] [ text "Reaction" ]
+                    ]
+                , tbody [] (List.map row model.scores)
+                ]
+            , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
+            , ul [] (List.map viewLocation model.history)
+            ]
+        ]
+
+
+viewCode : Html msg
+viewCode =
+    pre []
+        [ code
+            []
+            [ span [ class "code-block" ]
+                [ text """type Score
+        = Touchdown
+        | ExtraPoint
+        | FieldGoal
+
+
+points : Score -> Int
+points s =
+        case s of
+            Touchdown ->
+                6
+
+            ExtraPoint ->
+                1
+
+            FieldGoal ->
+                3
+
+
+reaction : Score -> String
+reaction =
+        always "OH YEAH!"
+                """ ]
+            ]
         ]
 
 

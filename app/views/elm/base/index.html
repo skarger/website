@@ -1,56 +1,14 @@
-
 <div class="wrapper">
-  <div class="header">
-    <h1>Elm Package Demos</h2>
-  </div>
-  <div class="sidebar">
-    <ul class="package-list">
-      <li>
-        Core
-        <ul class="module-list">
-          <li>Basics</li>
-          <li>
-            <ul class="function-list">
-              <li>always</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-  <div class="content">
-  <div class="code-block">
-  <pre><code><span class="code-block">type Score
-    = Touchdown
-    | ExtraPoint
-    | FieldGoal
-
-
-points : Score -> Int
-points s =
-    case s of
-        Touchdown ->
-            6
-
-        ExtraPoint ->
-            1
-
-        FieldGoal ->
-            3
-
-
-reaction : Score -> String
-reaction =
-    always "OH YEAH!"</span></code></pre>
-    </div>
-  </div>
-  <div class="right-content">
-    <div id="main"></div>
-  </div>
+  <div id="main"></div>
 </div>
 
-<script>hljs.initHighlightingOnLoad();</script>
 <script>
   var node = document.getElementById('main');
   var app = Elm.Main.embed(node);
+
+
+  app.ports.highlightCode.subscribe(function(str) {
+    hljs.initHighlighting.called = false;
+    hljs.initHighlighting();
+  });
 </script>

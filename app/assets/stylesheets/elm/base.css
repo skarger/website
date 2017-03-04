@@ -1,4 +1,4 @@
-.wrapper {
+#main-grid {
   height: 80%;
   display: grid;
   grid-template-columns: 14% 14% 14% 14% 14% 14% 14%;
