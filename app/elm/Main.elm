@@ -37,7 +37,7 @@ main =
 
 init : Navigation.Location -> ( Model, Cmd msg )
 init location =
-    ( Model [ location ] [], Ports.highlightCode Nothing )
+    ( Model [ location ] [], Ports.highlightCode Ports.emptyOptions )
 
 
 

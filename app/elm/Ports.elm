@@ -1,4 +1,13 @@
-port module Ports exposing (highlightCode)
+port module Ports exposing (emptyOptions, highlightCode)
 
 
-port highlightCode : Maybe String -> Cmd msg
+type alias EmptyRecord =
+    {}
+
+
+port highlightCode : EmptyRecord -> Cmd msg
+
+
+emptyOptions : EmptyRecord
+emptyOptions =
+    EmptyRecord

@@ -7,7 +7,7 @@
   var app = Elm.Main.embed(node);
 
 
-  app.ports.highlightCode.subscribe(function(str) {
+  app.ports.highlightCode.subscribe(function(options) {
     hljs.initHighlighting.called = false;
     hljs.initHighlighting();
   });
