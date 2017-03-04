@@ -21,3 +21,4 @@
 *.swp
 
 **/elm-stuff
+**/npm-debug.log

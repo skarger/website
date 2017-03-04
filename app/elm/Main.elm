@@ -1,12 +1,38 @@
 module Main exposing (..)
 
-import Html exposing (Html, button, div, text, table, thead, tbody, th, tr, td)
-import Html.Attributes exposing (class)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , text
+        , a
+        , ul
+        , li
+        , table
+        , thead
+        , tbody
+        , th
+        , tr
+        , td
+        )
+import Html.Attributes exposing (class, href, attribute)
 import Html.Events exposing (onClick)
+import Navigation
 
 
 main =
-    Html.beginnerProgram { model = model, view = view, update = update }
+    Navigation.program UrlChange
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = (\_ -> Sub.none)
+        }
+
+
+init : Navigation.Location -> ( Model, Cmd msg )
+init location =
+    ( Model [ location ] [], Cmd.none )
 
 
 
@@ -20,12 +46,15 @@ type Score
 
 
 type alias Model =
-    { scores : List Score }
+    { history : List Navigation.Location
+    , scores : List Score
+    }
 
 
 model : Model
 model =
-    { scores = []
+    { history = []
+    , scores = []
     }
 
 
@@ -34,26 +63,30 @@ model =
 
 
 type Msg
-    = Reset
+    = UrlChange Navigation.Location
+    | Reset
     | AddTouchdown
     | AddExtraPoint
     | AddFieldGoal
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UrlChange location ->
+            ( { model | history = location :: model.history }, Cmd.none )
+
         Reset ->
-            { model | scores = [] }
+            ( { model | scores = [] }, Cmd.none )
 
         AddTouchdown ->
-            { model | scores = model.scores ++ [ Touchdown ] }
+            ( { model | scores = model.scores ++ [ Touchdown ] }, Cmd.none )
 
         AddExtraPoint ->
-            { model | scores = model.scores ++ [ ExtraPoint ] }
+            ( { model | scores = model.scores ++ [ ExtraPoint ] }, Cmd.none )
 
         AddFieldGoal ->
-            { model | scores = model.scores ++ [ FieldGoal ] }
+            ( { model | scores = model.scores ++ [ FieldGoal ] }, Cmd.none )
 
 
 points : Score -> Int
@@ -115,4 +148,16 @@ view model =
                 ]
             , tbody [] (List.map row model.scores)
             ]
+        , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
+        , ul [] (List.map viewLocation model.history)
         ]
+
+
+viewLink : String -> Html msg
+viewLink name =
+    li [] [ a [ href ("#" ++ name), attribute "data-turbolinks" "false" ] [ text name ] ]
+
+
+viewLocation : Navigation.Location -> Html msg
+viewLocation location =
+    li [] [ text (location.pathname ++ location.hash) ]
