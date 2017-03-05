@@ -9267,8 +9267,10 @@ _elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/na
 var _user$project$Ports$highlightCode = _elm_lang$core$Native_Platform.outgoingPort(
 	'highlightCode',
 	function (v) {
-		return (v.ctor === 'Nothing') ? null : v._0;
+		return {};
 	});
+var _user$project$Ports$EmptyRecord = {};
+var _user$project$Ports$emptyOptions = _user$project$Ports$EmptyRecord;
 
 var _user$project$Main$viewLocation = function (location) {
 	return A2(
@@ -9333,6 +9335,126 @@ var _user$project$Main$viewCode = A2(
 			}),
 		_1: {ctor: '[]'}
 	});
+var _user$project$Main$viewHome = {
+	ctor: '::',
+	_0: A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('about'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('This is a demo area for various module functions in the Elm core libraries. It\'s built as an SPA using the Navigation package.'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		}),
+	_1: {ctor: '[]'}
+};
+var _user$project$Main$viewSidebar = {
+	ctor: '::',
+	_0: A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$href('#home'),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-turbolinks', 'false'),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('About'),
+			_1: {ctor: '[]'}
+		}),
+	_1: {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$ul,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('package-list'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Core'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$ul,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('module-list'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$li,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Basics'),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$li,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$ul,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('function-list'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$li,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _user$project$Main$viewLink('always'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	}
+};
 var _user$project$Main$reaction = _elm_lang$core$Basics$always('OH YEAH!');
 var _user$project$Main$reactionItem = function (score) {
 	return A2(
@@ -9395,7 +9517,7 @@ var _user$project$Main$init = function (location) {
 				_1: {ctor: '[]'}
 			},
 			{ctor: '[]'}),
-		_1: _user$project$Ports$highlightCode(_elm_lang$core$Maybe$Nothing)
+		_1: _user$project$Ports$highlightCode(_user$project$Ports$emptyOptions)
 	};
 };
 var _user$project$Main$FieldGoal = {ctor: 'FieldGoal'};
@@ -9406,14 +9528,13 @@ var _user$project$Main$update = F2(
 		var _p1 = msg;
 		switch (_p1.ctor) {
 			case 'UrlChange':
+				var updatedHistory = {ctor: '::', _0: _p1._0, _1: model.history};
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							history: {ctor: '::', _0: _p1._0, _1: model.history}
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
+						{history: updatedHistory}),
+					_1: _user$project$Ports$highlightCode(_user$project$Ports$emptyOptions)
 				};
 			case 'Reset':
 				return {
@@ -9482,6 +9603,163 @@ var _user$project$Main$AddFieldGoal = {ctor: 'AddFieldGoal'};
 var _user$project$Main$AddExtraPoint = {ctor: 'AddExtraPoint'};
 var _user$project$Main$AddTouchdown = {ctor: 'AddTouchdown'};
 var _user$project$Main$Reset = {ctor: 'Reset'};
+var _user$project$Main$viewAlways = function (model) {
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('content'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _user$project$Main$viewCode,
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('right-content'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('demo'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Reset),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Reset'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('demo'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddTouchdown),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Touchdown'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('demo'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddExtraPoint),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Extra Point'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('demo'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddFieldGoal),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Field Goal'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$table,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$thead,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$th,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Points'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$th,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Reaction'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$tbody,
+													{ctor: '[]'},
+													A2(_elm_lang$core$List$map, _user$project$Main$row, model.scores)),
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$Main$viewContent = F2(
+	function (model, location) {
+		var _p2 = location;
+		if (_p2 === '/elm#always') {
+			return _user$project$Main$viewAlways(model);
+		} else {
+			return _user$project$Main$viewHome;
+		}
+	});
 var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9490,106 +9768,25 @@ var _user$project$Main$view = function (model) {
 			_0: _elm_lang$html$Html_Attributes$id('main-grid'),
 			_1: {ctor: '[]'}
 		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('header'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h1,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Elm Package Demos'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+		A2(
+			_elm_lang$core$List$append,
+			{
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+						_0: _elm_lang$html$Html_Attributes$class('header'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$ul,
+							_elm_lang$html$Html$h1,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('package-list'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$li,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Core'),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$ul,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('module-list'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$li,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Basics'),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$li,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$ul,
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$class('function-list'),
-																				_1: {ctor: '[]'}
-																			},
-																			{
-																				ctor: '::',
-																				_0: A2(
-																					_elm_lang$html$Html$li,
-																					{ctor: '[]'},
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html$text('always'),
-																						_1: {ctor: '[]'}
-																					}),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}
-														}),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}),
+								_0: _elm_lang$html$Html$text('Elm Package Demos'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -9600,185 +9797,25 @@ var _user$project$Main$view = function (model) {
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('content'),
+							_0: _elm_lang$html$Html_Attributes$class('sidebar'),
 							_1: {ctor: '[]'}
 						},
-						{
-							ctor: '::',
-							_0: _user$project$Main$viewCode,
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('right-content'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('demo'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Reset),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Reset'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('demo'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddTouchdown),
-												_1: {ctor: '[]'}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Touchdown'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('demo'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddExtraPoint),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Extra Point'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$button,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('demo'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddFieldGoal),
-														_1: {ctor: '[]'}
-													}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Field Goal'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$table,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$thead,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$th,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Points'),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$th,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Reaction'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$tbody,
-																{ctor: '[]'},
-																A2(_elm_lang$core$List$map, _user$project$Main$row, model.scores)),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$ul,
-														{ctor: '[]'},
-														A2(
-															_elm_lang$core$List$map,
-															_user$project$Main$viewLink,
-															{
-																ctor: '::',
-																_0: 'bears',
-																_1: {
-																	ctor: '::',
-																	_0: 'cats',
-																	_1: {
-																		ctor: '::',
-																		_0: 'dogs',
-																		_1: {
-																			ctor: '::',
-																			_0: 'elephants',
-																			_1: {
-																				ctor: '::',
-																				_0: 'fish',
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}
-																}
-															})),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$ul,
-															{ctor: '[]'},
-															A2(_elm_lang$core$List$map, _user$project$Main$viewLocation, model.history)),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}),
-						_1: {ctor: '[]'}
-					}
+						_user$project$Main$viewSidebar),
+					_1: {ctor: '[]'}
 				}
-			}
-		});
+			},
+			function () {
+				var _p3 = _elm_lang$core$List$head(model.history);
+				if (_p3.ctor === 'Just') {
+					var _p4 = _p3._0;
+					return A2(
+						_user$project$Main$viewContent,
+						model,
+						A2(_elm_lang$core$Basics_ops['++'], _p4.pathname, _p4.hash));
+				} else {
+					return _user$project$Main$viewHome;
+				}
+			}()));
 };
 var _user$project$Main$UrlChange = function (a) {
 	return {ctor: 'UrlChange', _0: a};
@@ -9790,7 +9827,7 @@ var _user$project$Main$main = A2(
 		init: _user$project$Main$init,
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p2) {
+		subscriptions: function (_p5) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
