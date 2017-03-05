@@ -1,7 +1,7 @@
 #main-grid {
   height: 80%;
   display: grid;
-  grid-template-columns: 14% 14% 14% 14% 14% 14% 14%;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-template-rows: 10% 90%;
 }
 
@@ -30,6 +30,8 @@ ul.package-list,
 ul.module-list,
 ul.function-list {
   list-style-type: none;
+  padding-left: 18%;
+  overflow: hidden;
 }
 
 .content {
