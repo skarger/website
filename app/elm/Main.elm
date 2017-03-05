@@ -79,7 +79,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UrlChange location ->
-            ( { model | history = location :: model.history }, Cmd.none )
+            let
+                updatedHistory =
+                    location :: model.history
+            in
+                ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
 
         Reset ->
             ( { model | scores = [] }, Cmd.none )
@@ -141,47 +145,78 @@ reactionItem score =
 
 view : Model -> Html Msg
 view model =
-    div [ id "main-grid" ]
-        [ div [ class "header" ]
-            [ h1 [] [ text "Elm Package Demos" ]
+    div [ id "main-grid" ] <|
+        List.append
+            [ div [ class "header" ] [ h1 [] [ text "Elm Package Demos" ] ]
+            , div [ class "sidebar" ] viewSidebar
             ]
-        , div [ class "sidebar" ]
-            [ ul [ class "package-list" ]
+            (case List.head model.history of
+                Just location ->
+                    viewContent model (location.pathname ++ location.hash)
+
+                Nothing ->
+                    viewHome
+            )
+
+
+viewSidebar : List (Html Msg)
+viewSidebar =
+    [ a [ href "#home", attribute "data-turbolinks" "false" ] [ text "About" ]
+    , ul [ class "package-list" ]
+        [ li []
+            [ text "Core"
+            , ul [ class "module-list" ]
                 [ li []
-                    [ text "Core"
-                    , ul [ class "module-list" ]
-                        [ li []
-                            [ text "Basics"
-                            , li
-                                []
-                                [ ul [ class "function-list" ]
-                                    [ li [] [ text "always" ]
-                                    ]
-                                ]
+                    [ text "Basics"
+                    , li
+                        []
+                        [ ul [ class "function-list" ]
+                            [ li [] [ viewLink "always" ]
                             ]
                         ]
                     ]
                 ]
             ]
-        , div [ class "content" ]
-            [ viewCode
-            ]
-        , div [ class "right-content" ]
-            [ button [ class "demo", onClick Reset ] [ text "Reset" ]
-            , button [ class "demo", onClick AddTouchdown ] [ text "Touchdown" ]
-            , button [ class "demo", onClick AddExtraPoint ] [ text "Extra Point" ]
-            , button [ class "demo", onClick AddFieldGoal ] [ text "Field Goal" ]
-            , table []
-                [ thead []
-                    [ th [] [ text "Points" ]
-                    , th [] [ text "Reaction" ]
-                    ]
-                , tbody [] (List.map row model.scores)
+        ]
+    ]
+
+
+viewContent : Model -> String -> List (Html Msg)
+viewContent model location =
+    case location of
+        "/elm#always" ->
+            viewAlways model
+
+        otherwise ->
+            viewHome
+
+
+viewHome : List (Html Msg)
+viewHome =
+    [ div [ class "content" ]
+        [ span [ class "about" ] [ text "This is a demo area for various module functions in the Elm core libraries. It's built as an SPA using the Navigation package." ] ]
+    ]
+
+
+viewAlways : Model -> List (Html Msg)
+viewAlways model =
+    [ div [ class "content" ]
+        [ viewCode
+        ]
+    , div [ class "right-content" ]
+        [ button [ class "demo", onClick Reset ] [ text "Reset" ]
+        , button [ class "demo", onClick AddTouchdown ] [ text "Touchdown" ]
+        , button [ class "demo", onClick AddExtraPoint ] [ text "Extra Point" ]
+        , button [ class "demo", onClick AddFieldGoal ] [ text "Field Goal" ]
+        , table []
+            [ thead []
+                [ th [] [ text "Points" ]
+                , th [] [ text "Reaction" ]
                 ]
-            , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-            , ul [] (List.map viewLocation model.history)
+            , tbody [] (List.map row model.scores)
             ]
         ]
+    ]
 
 
 viewCode : Html msg

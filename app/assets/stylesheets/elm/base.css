@@ -5,6 +5,10 @@
   grid-template-rows: 10% 90%;
 }
 
+span.about {
+  text-align: center;
+}
+
 span.code-block {
   font-size: large;
 }

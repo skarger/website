@@ -8,7 +8,18 @@
 
 
   app.ports.highlightCode.subscribe(function(options) {
-    hljs.initHighlighting.called = false;
-    hljs.initHighlighting();
+    var highlightPoller = setInterval(function() {
+      hljs.initHighlighting.called = false;
+      hljs.initHighlighting();
+
+      // no need to keep checking if highlighting complete
+      var codeBlocks = $('code');
+      var highlightedCodeBlocks = $('code.hljs');
+      if (codeBlocks.length > 0 &&
+          (highlightedCodeBlocks.length >= codeBlocks.length) )
+      {
+        clearInterval(highlightPoller);
+      }
+    }, 100)
   });
 </script>
