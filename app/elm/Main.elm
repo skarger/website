@@ -13,6 +13,7 @@ import Html
         , a
         , ul
         , li
+        , p
         , table
         , thead
         , tbody
@@ -83,7 +84,7 @@ update msg model =
                 updatedHistory =
                     location :: model.history
             in
-                ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
+                Debug.log "" ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
 
         Reset ->
             ( { model | scores = [] }, Cmd.none )
@@ -161,7 +162,7 @@ view model =
 
 viewSidebar : List (Html Msg)
 viewSidebar =
-    [ a [ href "#home", attribute "data-turbolinks" "false" ] [ text "About" ]
+    [ a [ href "/elm#about", attribute "data-turbolinks" "false" ] [ text "About" ]
     , ul [ class "package-list" ]
         [ li []
             [ text "Core"
@@ -194,7 +195,21 @@ viewContent model location =
 viewHome : List (Html Msg)
 viewHome =
     [ div [ class "content" ]
-        [ span [ class "about" ] [ text "This is a demo area for various module functions in the Elm core libraries. It's built as an SPA using the Navigation package." ] ]
+        [ span [ class "about" ]
+            [ p []
+                [ text """
+        Choose from the left sidebar to view demos of various functions from the Elm core libraries.
+        """
+                ]
+            , p []
+                [ text """
+        This demo area is an Elm SPA itself, using the
+        """
+                , a [ href "http://package.elm-lang.org/packages/elm-lang/navigation/latest" ] [ text "Navigation" ]
+                , text " package for routing."
+                ]
+            ]
+        ]
     ]
 
 
