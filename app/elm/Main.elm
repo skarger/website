@@ -84,7 +84,7 @@ update msg model =
                 updatedHistory =
                     location :: model.history
             in
-                Debug.log "" ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
+                ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
 
         Reset ->
             ( { model | scores = [] }, Cmd.none )
