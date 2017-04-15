@@ -9355,8 +9355,45 @@ var _user$project$Main$viewHome = {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('This is a demo area for various module functions in the Elm core libraries. It\'s built as an SPA using the Navigation package.'),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('\n        Choose from the left sidebar to view demos of various functions from the Elm core libraries.\n        '),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('\n        This demo area is an Elm SPA itself, using the\n        '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('http://package.elm-lang.org/packages/elm-lang/navigation/latest'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Navigation'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(' package for routing.'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}),
 			_1: {ctor: '[]'}
 		}),
@@ -9368,7 +9405,7 @@ var _user$project$Main$viewSidebar = {
 		_elm_lang$html$Html$a,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$href('#home'),
+			_0: _elm_lang$html$Html_Attributes$href('/elm#about'),
 			_1: {
 				ctor: '::',
 				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-turbolinks', 'false'),
