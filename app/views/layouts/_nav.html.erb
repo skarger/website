@@ -1,9 +1,16 @@
 <div class="nav_container">
     <ul class="nav_list">
         <li class="<%= current_page?(root_path) ? :current : nil %>"><a class="nav_list" href="/">/</a></li>
-        <li class="<%= current_page?(workouts_path) ? :current : nil %>">
-            <%= link_to "WORKOUTS", workouts_path, class: "nav_list" %>
+
+        <li class="<%= current_page?(elm_root_path) ? :current : nil %>">
+            <%= link_to "ELM", elm_root_path, class: "nav_list" %>
         </li>
+
+        <% if logged_in? %>
+            <li class="<%= current_page?(workouts_path) ? :current : nil %>">
+            <%= link_to "WORKOUTS", workouts_path, class: "nav_list" %>
+            </li>
+        <% end %>
 
         <% if logged_in? %>
             <li class="<%= current_page?(logout_path) ? :current : nil %>">
