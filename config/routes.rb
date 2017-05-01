@@ -15,4 +15,6 @@ Rails.application.routes.draw do
   namespace :elm do
     root 'base#index'
   end
+
+  resource :resume, only: [:show]
 end
