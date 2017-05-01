@@ -48,4 +48,4 @@ group :development, :test do
 end
 
 
-ruby '2.3.1'
+ruby '2.4.1'
