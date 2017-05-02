@@ -17,4 +17,5 @@ Rails.application.routes.draw do
   end
 
   resource :resume, only: [:show]
+  resource :about, only: [:show]
 end
