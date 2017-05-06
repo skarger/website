@@ -1,4 +1,4 @@
-<%= form_for([@workout, @track_interval], url: workout_track_intervals_path(@workout)) do |f| %>
+<%= form_with(scope: :track_interval, model: @track_interval, url: workout_track_intervals_path(@workout)) do |f| %>
   <% if @track_interval.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@track_interval.errors.count, "error") %> prohibited this track interval from being saved:</h2>
