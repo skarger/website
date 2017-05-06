@@ -4,7 +4,7 @@
 
 <div class="row">
   <div class="login">
-    <%= form_for(:session, url: login_path) do |f| %>
+    <%= form_with(scope: :session, url: login_path) do |f| %>
       <div class="login-input">
         <%= f.label :email %>
         <%= f.text_field :email %>
