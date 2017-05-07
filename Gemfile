@@ -13,7 +13,7 @@ gem 'uglifier'
 gem 'coffee-rails'
 
 # Install webpacker from github to get Elm support
-#gem 'webpacker', github: 'rails/webpacker'
+gem 'webpacker', github: 'rails/webpacker'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'

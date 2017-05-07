@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/rails/webpacker.git
+  revision: 74cde3c0f028516f11a793c17235ea71af21bca6
+  specs:
+    webpacker (1.2)
+      activesupport (>= 4.2)
+      multi_json (~> 1.2)
+      railties (>= 4.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -197,6 +206,7 @@ DEPENDENCIES
   turbolinks
   uglifier
   unicorn
+  webpacker!
 
 RUBY VERSION
    ruby 2.4.1p111

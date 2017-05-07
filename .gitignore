@@ -24,3 +24,5 @@
 **/npm-debug.log
 
 notes
+/public/packs
+/node_modules
