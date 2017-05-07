@@ -24,14 +24,7 @@ rspec
 
 * Deployment instructions
 
-For Elm:
-
-```
-cd app/elm
-elm make Main.elm --output ../assets/javascripts/elm/base.js
-```
-
-git push heroku-cedar-14 master
+`git push origin master`
 
 * ...
 
