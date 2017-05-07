@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create'
   delete '/logout', to: 'sessions#destroy'
 
-  namespace :elm do
+  namespace :elm_demo do
     root 'base#index'
   end
 
