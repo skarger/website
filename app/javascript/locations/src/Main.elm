@@ -21,8 +21,6 @@ import GoogleMaps
 
 type alias Flags =
     { waiting : String
-    , yo : Int
-    , bro : String
     , randomInt : Int
     }
 

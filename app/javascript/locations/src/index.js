@@ -1,12 +1,13 @@
 'use strict';
 
+
 // semantic-ui includes javascript modules too but we are not currently requiring them
 require('semantic-ui-css/semantic.min.css')
 
 require("./css/styles.css");
 var waiting = require("./img/waiting.gif");
 var StopsMap = require("./stopsMap.js");
-var Elm = require('./Main.elm');
+import App from './Main'
 
 var setupPorts = function(app) {
     app.ports.draw.subscribe(function(location) {
@@ -51,7 +52,7 @@ window.stopsEntryApp = function() {
 
     var mountNode = document.getElementById('stops-container');
 
-    var app = Elm.Main.embed(mountNode, {
+    var app = App.Main.embed(mountNode, {
         waiting: waiting,
         randomInt: randomInt()
     });

@@ -1,1 +1,1 @@
-require('locations')
+require('locations/src')

@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     root 'base#index'
   end
 
+  resource :locations, only: [:show]
+
   resource :resume, only: [:show]
   resource :about, only: [:show]
 end
