@@ -48,6 +48,7 @@ test:
   password: website
 
 production:
+  url: <%= ENV.fetch('DATABASE_URL', '').sub(/^postgres/, "postgis") %>
   adapter: postgis
   encoding: unicode
   database: website_production
