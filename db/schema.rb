@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20170508141407) do
     t.datetime "updated_at", null: false
     t.uuid "uuid", default: -> { "uuid_generate_v4()" }
     t.index ["point"], name: "index_locations_on_point"
-    t.index ["uuid"], name: "index_locations_on_uuid"
+    t.index ["uuid"], name: "index_locations_on_uuid", unique: true
   end
 
   create_table "track_intervals", id: :serial, force: :cascade do |t|
