@@ -88,7 +88,7 @@ RSpec.describe TrackIntervalsController, :type => :controller do
     end
 
     context 'when the user is logged in and owns the workout' do
-      let(:track_interval) { TrackInterval.new }
+      let(:track_interval) { TrackInterval.new(time: "60", rest: "90") }
 
       before(:each) do
         allow(subject).to receive(:logged_in?).and_return(true)
