@@ -115,7 +115,7 @@ saveStopsToServer : Body -> Cmd Msg
 saveStopsToServer body =
     let
         path =
-            "/api/v1.0/stops_mgmt/stop_collections"
+            "/api/locations_collections"
 
         errorDecoder =
             Json.Decode.list (Json.Decode.dict Json.Decode.string)

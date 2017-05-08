@@ -23,5 +23,6 @@ Rails.application.routes.draw do
 
   namespace :api do
     resource :nearby_locations, only: [:show]
+    resources :location_collections, only: [:create]
   end
 end
