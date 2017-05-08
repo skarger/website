@@ -33,6 +33,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "scripts" : {
-    "test": "elm-test app/javascript/locations/tests/Main.elm"
+    "test": "elm-test app/javascript/locations/tests/Main.elm",
+    "postinstall": "npm rebuild node-sass"
   }
 }
