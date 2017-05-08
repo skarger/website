@@ -134,7 +134,7 @@ all =
                         updatedStopAreas =
                             Dict.singleton stopAreaId
                                 { stopArea
-                                    | status = Invalid "Please choose a stop"
+                                    | status = Invalid "Please choose a location"
                                 }
                     in
                         Expect.equal
