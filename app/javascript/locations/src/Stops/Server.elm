@@ -19,13 +19,12 @@ fetchPossibleDuplicates stopAreaId stop =
             stop.longitude
 
         path =
-            "/api/v1.0/stops_mgmt/possible_duplicates"
+            "/api/nearby_locations"
 
         query =
             queryString
                 [ ( "latitude", toString latitude )
                 , ( "longitude", toString longitude )
-                , ( "filter[role]", "service" )
                 ]
 
         request =
