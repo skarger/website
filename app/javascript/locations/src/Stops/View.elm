@@ -55,7 +55,7 @@ saveButtonLabel model =
                 case model.saveStatus of
                     Failure ->
                         [ div [ class "ui red basic large label", style [ ( "float", "right" ) ] ]
-                            [ text "Save failed. Try again and/or contact tech team." ]
+                            [ text "Save failed. Try again and/or edit locations." ]
                         ]
 
                     Success ->
