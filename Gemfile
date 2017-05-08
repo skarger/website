@@ -56,4 +56,8 @@ group :development do
   gem 'listen'
 end
 
+group :test do
+  gem 'json_expressions'
+end
+
 ruby '2.4.1'
