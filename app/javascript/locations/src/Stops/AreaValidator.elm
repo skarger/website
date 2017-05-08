@@ -39,13 +39,13 @@ validateStopArea : StopArea -> StopArea
 validateStopArea sa =
     case sa.chosen of
         Nothing ->
-            ({ sa | status = Invalid "Please choose a stop" })
+            ({ sa | status = Invalid "Please choose a location" })
 
         Just s ->
             let
                 status =
                     if stopAttr .name s == "" then
-                        Invalid "Stop name cannot be empty"
+                        Invalid "Location name cannot be empty"
                     else
                         Valid
             in

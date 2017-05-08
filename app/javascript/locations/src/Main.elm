@@ -198,7 +198,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ id "main" ]
-        [ h3 [ id "main-heading" ] [ text "Stops Entry" ]
+        [ h3 [ id "main-heading" ] [ text "Locations Entry" ]
         , div [ class "urls-section" ]
             [ div
                 [ class "ui input url-entry" ]

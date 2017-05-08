@@ -31,7 +31,7 @@ view model =
         , div [ class "ui grid" ]
             [ div [ class "two column row" ]
                 [ div [ class "left floated column" ]
-                    [ button [ class "ui red button", onClick ClearStops ] [ text "Clear Stops" ]
+                    [ button [ class "ui red button", onClick ClearStops ] [ text "Clear Locations" ]
                     ]
                 , div [ class "right floated column" ] (saveButton model)
                 ]
@@ -60,7 +60,7 @@ saveButtonLabel model =
 
                     Success ->
                         [ div [ class "ui blue basic large label", style [ ( "float", "right" ) ] ]
-                            [ text "Saved stops" ]
+                            [ text "Saved locations" ]
                         ]
 
                     otherwise ->
@@ -91,7 +91,7 @@ saveButton model =
     in
         [ button
             [ class buttonClass, onClick SaveStops ]
-            [ text "Save Stops" ]
+            [ text "Save Locations" ]
         ]
 
 
@@ -326,7 +326,7 @@ possibleDuplicateList stopAreaId stopArea pds =
             []
 
         False ->
-            div [ class "ui sub header" ] [ text "Nearby Stops" ]
+            div [ class "ui sub header" ] [ text "Nearby Locations" ]
                 :: List.map (possibleDuplicateItem stopAreaId stopArea) pds
 
 

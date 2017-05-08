@@ -70,7 +70,7 @@ all =
                             testStopArea stopId Nothing
                     in
                         Expect.equal
-                            ({ stopArea | status = Invalid "Please choose a stop" })
+                            ({ stopArea | status = Invalid "Please choose a location" })
                             (StopAreaValidator.validateStopArea stopArea)
             , test "is not valid when chosen stop has empty name" <|
                 \() ->
@@ -85,7 +85,7 @@ all =
                             testStopArea stopId (Just <| testNewStop stopId name)
                     in
                         Expect.equal
-                            ({ stopArea | status = Invalid "Stop name cannot be empty" })
+                            ({ stopArea | status = Invalid "Location name cannot be empty" })
                             (StopAreaValidator.validateStopArea stopArea)
             ]
         , describe ".validate"
