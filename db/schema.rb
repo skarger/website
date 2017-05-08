@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170508014546) do
+ActiveRecord::Schema.define(version: 20170508141407) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
+  enable_extension "uuid-ossp"
 
   create_table "distance_runs", id: :serial, force: :cascade do |t|
     t.decimal "distance_in_miles"
@@ -30,7 +31,9 @@ ActiveRecord::Schema.define(version: 20170508014546) do
     t.geography "point", limit: {:srid=>4326, :type=>"st_point", :geographic=>true}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "uuid", default: -> { "uuid_generate_v4()" }
     t.index ["point"], name: "index_locations_on_point"
+    t.index ["uuid"], name: "index_locations_on_uuid"
   end
 
   create_table "track_intervals", id: :serial, force: :cascade do |t|
