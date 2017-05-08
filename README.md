@@ -24,6 +24,9 @@ rspec
 
 * Deployment instructions
 
+Create `website` role in Postgres with superuser.
+`rails db:gis:setup`
+
 `git push origin master`
 
 * ...

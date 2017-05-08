@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '~> 5.1'
 # Use postgres as the database for Active Record
 gem 'pg'
+# enable PostGIS
+gem 'activerecord-postgis-adapter'
 # Use SCSS for stylesheets
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
@@ -52,6 +54,10 @@ end
 
 group :development do
   gem 'listen'
+end
+
+group :test do
+  gem 'json_expressions'
 end
 
 ruby '2.4.1'

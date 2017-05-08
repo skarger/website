@@ -1,0 +1,51 @@
+#stops-container {
+  /* left align */
+  position: absolute;
+
+  width: 50%;
+  padding: 1%;
+}
+
+#map-container {
+  /* right align, keep in viewport while scrolling stops */
+  position: fixed;
+  right: 0px;
+
+  height: 95%;
+  width: 50%;
+  padding: 1%;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.url-entry {
+  width: 85%;
+}
+
+#stops-view div .waiting {
+  height: 50px;
+}
+
+input.stop-name {
+  width: 100%;
+}
+
+.spacer-button {
+  visibility: hidden;
+}
+
+.stop-item {
+  width: 75%;
+  overflow: auto;
+  border: 0.4em solid;
+  border-color: transparent;
+}
+
+.chosen-stop {
+  border-radius: 0.5em;
+  border-color: #e0e1e2;
+  background-color: #e0e1e2;
+}
