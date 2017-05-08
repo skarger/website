@@ -18,7 +18,7 @@ gem 'coffee-rails'
 gem 'jquery-rails'
 
 # Install webpacker from github to get Elm support
-gem 'webpacker', github: 'rails/webpacker'
+gem 'webpacker', github: 'skarger/webpacker', branch: 'elm-compile-debug-env'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
