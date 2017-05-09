@@ -1,24 +1,24 @@
-module Stops.Geocoder exposing (geocodeStops, handleGeocodingResponse, nameFromResult)
+module Locations.Geocoder exposing (geocodeLocations, handleGeocodingResponse, nameFromResult)
 
 import Http
 import List exposing (head)
 import Dict exposing (Dict)
 import Geocoding
-import Messages exposing (Msg(StopsGeocoderResult))
+import Messages exposing (Msg(LocationsGeocoderResult))
 import Models exposing (Model)
-import Stops.Models
+import Locations.Models
     exposing
-        ( StopInput(..)
-        , StopId
-        , Stop(..)
-        , StopArea
-        , StopAreaId
+        ( LocationInput(..)
+        , LocationId
+        , Location(..)
+        , LocationArea
+        , LocationAreaId
         , Coordinates
-        , CompleteStop
-        , StopAreaStatus(..)
+        , CompleteLocation
+        , LocationAreaStatus(..)
         )
-import Stops.Stops as Stops
-import Stops.Models exposing (extractStopInputId, toCompleteStop)
+import Locations.Locations as Locations
+import Locations.Models exposing (extractLocationInputId, toCompleteLocation)
 
 
 apiKey : String
@@ -26,86 +26,86 @@ apiKey =
     ""
 
 
-geocodeStops : Dict StopAreaId StopArea -> Cmd Msg
-geocodeStops stopAreas =
-    Dict.map geocodeStop stopAreas |> Dict.values |> Cmd.batch
+geocodeLocations : Dict LocationAreaId LocationArea -> Cmd Msg
+geocodeLocations locationAreas =
+    Dict.map geocodeLocation locationAreas |> Dict.values |> Cmd.batch
 
 
-geocodeStop : StopAreaId -> StopArea -> Cmd Msg
-geocodeStop stopAreaId stopArea =
-    geocodingRequest stopAreaId stopArea
+geocodeLocation : LocationAreaId -> LocationArea -> Cmd Msg
+geocodeLocation locationAreaId locationArea =
+    geocodingRequest locationAreaId locationArea
 
 
-geocodingRequest : StopAreaId -> StopArea -> Cmd Msg
+geocodingRequest : LocationAreaId -> LocationArea -> Cmd Msg
 geocodingRequest id sa =
-    case sa.stopInput of
+    case sa.locationInput of
         Address _ a ->
             forwardGeocode id sa a
 
-        PointFromUrl _ lat lng ->
+        LatLngFromUrl _ lat lng ->
             reverseGeocode id sa lat lng
 
-        PointFromMap _ lat lng ->
+        LatLngFromMap _ lat lng ->
             reverseGeocode id sa lat lng
 
 
-reverseGeocode : StopAreaId -> StopArea -> Float -> Float -> Cmd Msg
-reverseGeocode stopAreaId stopArea lat lng =
+reverseGeocode : LocationAreaId -> LocationArea -> Float -> Float -> Cmd Msg
+reverseGeocode locationAreaId locationArea lat lng =
     Geocoding.reverseRequestForLatLng apiKey ( lat, lng )
-        |> Geocoding.sendReverseRequest (StopsGeocoderResult stopAreaId stopArea)
+        |> Geocoding.sendReverseRequest (LocationsGeocoderResult locationAreaId locationArea)
 
 
-forwardGeocode : StopAreaId -> StopArea -> String -> Cmd Msg
-forwardGeocode stopAreaId stopArea addr =
+forwardGeocode : LocationAreaId -> LocationArea -> String -> Cmd Msg
+forwardGeocode locationAreaId locationArea addr =
     Geocoding.requestForAddress apiKey addr
-        |> Geocoding.send (StopsGeocoderResult stopAreaId stopArea)
+        |> Geocoding.send (LocationsGeocoderResult locationAreaId locationArea)
 
 
 handleGeocodingResponse :
     Model
-    -> StopAreaId
-    -> StopArea
+    -> LocationAreaId
+    -> LocationArea
     -> Result Http.Error Geocoding.Response
     -> ( Model, Cmd Msg )
-handleGeocodingResponse model stopAreaId stopArea response =
+handleGeocodingResponse model locationAreaId locationArea response =
     case extractResponseData response of
         Ok ( name, coords ) ->
             let
-                stopId =
-                    extractStopInputId stopArea.stopInput
+                locationId =
+                    extractLocationInputId locationArea.locationInput
 
-                stop =
-                    stopFromResponse model stopArea.stopInput name coords
+                location =
+                    locationFromResponse model locationArea.locationInput name coords
 
                 updatedModel =
-                    Stops.updateStopArea model
-                        stopAreaId
-                        (Stops.overwriteWith
-                            { stopArea
-                                | stops = Dict.singleton stopId stop
+                    Locations.updateLocationArea model
+                        locationAreaId
+                        (Locations.overwriteWith
+                            { locationArea
+                                | locations = Dict.singleton locationId location
                                 , status = GeocodeSuccess
                             }
                         )
 
-                updatedStopArea =
-                    Dict.get stopAreaId updatedModel.stopAreas
+                updatedLocationArea =
+                    Dict.get locationAreaId updatedModel.locationAreas
             in
-                case updatedStopArea of
+                case updatedLocationArea of
                     Just sa ->
-                        Stops.afterSuccessfulGeocode
+                        Locations.afterSuccessfulGeocode
                             updatedModel
-                            stopAreaId
+                            locationAreaId
                             sa
-                            (toCompleteStop stop)
+                            (toCompleteLocation location)
 
                     Nothing ->
                         ( updatedModel, Cmd.none )
 
         Err error ->
-            ( Stops.updateStopArea model
-                stopAreaId
-                (Stops.overwriteWith
-                    { stopArea
+            ( Locations.updateLocationArea model
+                locationAreaId
+                (Locations.overwriteWith
+                    { locationArea
                         | status = GeocodeFailure "Geocoding failed"
                     }
                 )
@@ -113,13 +113,13 @@ handleGeocodingResponse model stopAreaId stopArea response =
             )
 
 
-stopFromResponse :
+locationFromResponse :
     Model
-    -> StopInput
+    -> LocationInput
     -> String
     -> Coordinates
-    -> Stop
-stopFromResponse model stopInput name coords =
+    -> Location
+locationFromResponse model locationInput name coords =
     let
         lat =
             coords.latitude
@@ -127,28 +127,28 @@ stopFromResponse model stopInput name coords =
         lng =
             coords.longitude
     in
-        case stopInput of
-            PointFromMap stopId lat lng ->
-                NewStop
-                    { id = stopId
+        case locationInput of
+            LatLngFromMap locationId lat lng ->
+                NewLocation
+                    { id = locationId
                     , latitude = lat
                     , longitude = lng
                     , name = name
                     , drawn = True
                     }
 
-            PointFromUrl stopId lat lng ->
-                NewStop
-                    { id = stopId
+            LatLngFromUrl locationId lat lng ->
+                NewLocation
+                    { id = locationId
                     , latitude = lat
                     , longitude = lng
                     , name = name
                     , drawn = False
                     }
 
-            Address stopId _ ->
-                NewStop
-                    { id = stopId
+            Address locationId _ ->
+                NewLocation
+                    { id = locationId
                     , latitude = lat
                     , longitude = lng
                     , name = name

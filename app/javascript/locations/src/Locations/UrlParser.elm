@@ -1,4 +1,4 @@
-module Stops.UrlParser exposing (parseStops)
+module Locations.UrlParser exposing (parseLocations)
 
 import Random.Pcg exposing (Seed)
 import UuidHelpers exposing (generateUuids)
@@ -18,50 +18,50 @@ import Combine
         )
 import Combine.Num exposing (float)
 import Models exposing (Model)
-import Stops.Models exposing (..)
+import Locations.Models exposing (..)
 
 
-type ParsedLocation
-    = LocationPoint Float Float
-    | LocationAddress String
+type ParsedPoint
+    = PointLatLng Float Float
+    | PointAddress String
 
 
 type alias ParseError =
     String
 
 
-parseStops : Model -> String -> Result String ( Seed, List StopInput )
-parseStops model url =
+parseLocations : Model -> String -> Result String ( Seed, List LocationInput )
+parseLocations model url =
     case parseUrl url of
-        Ok parsedLocations ->
+        Ok parsedPoints ->
             let
-                ( newSeed, newStops ) =
-                    toStopList model.currentSeed parsedLocations
+                ( newSeed, newLocations ) =
+                    toLocationList model.currentSeed parsedPoints
             in
-                Ok ( newSeed, newStops )
+                Ok ( newSeed, newLocations )
 
         Err error ->
             Err error
 
 
-toStopList : Seed -> List ParsedLocation -> ( Seed, List StopInput )
-toStopList seed parsedLocations =
-    generateUuids seed parsedLocations
+toLocationList : Seed -> List ParsedPoint -> ( Seed, List LocationInput )
+toLocationList seed parsedPoints =
+    generateUuids seed parsedPoints
         |> Tuple.mapSecond
-            (List.map toStopInput << List.map2 (,) parsedLocations)
+            (List.map toLocationInput << List.map2 (,) parsedPoints)
 
 
-toStopInput : ( ParsedLocation, StopId ) -> StopInput
-toStopInput ( pl, id ) =
+toLocationInput : ( ParsedPoint, LocationId ) -> LocationInput
+toLocationInput ( pl, id ) =
     case pl of
-        LocationPoint lat lng ->
-            PointFromUrl id lat lng
+        PointLatLng lat lng ->
+            LatLngFromUrl id lat lng
 
-        LocationAddress name ->
+        PointAddress name ->
             Address id name
 
 
-parseUrl : String -> Result ParseError (List ParsedLocation)
+parseUrl : String -> Result ParseError (List ParsedPoint)
 parseUrl url =
     case parse lineParser url of
         Err ( _, _, errors ) ->
@@ -71,9 +71,9 @@ parseUrl url =
             Ok result
 
 
-lineParser : Parser s (List ParsedLocation)
+lineParser : Parser s (List ParsedPoint)
 lineParser =
-    prefix *> locations <* suffix
+    prefix *> points <* suffix
 
 
 prefix : Parser s String
@@ -89,14 +89,14 @@ suffix =
     regex ".*$"
 
 
-locations : Parser s (List ParsedLocation)
-locations =
-    sepEndBy (string "/") (or point address)
+points : Parser s (List ParsedPoint)
+points =
+    sepEndBy (string "/") (or latLng address)
 
 
-point : Parser s ParsedLocation
-point =
-    ((LocationPoint) <$> latitude <*> longitude)
+latLng : Parser s ParsedPoint
+latLng =
+    ((PointLatLng) <$> latitude <*> longitude)
 
 
 latitude : Parser s Float
@@ -120,6 +120,6 @@ comma =
 -- to avoid reading the suffix as a textual address we reject characters [/@]
 
 
-address : Parser s ParsedLocation
+address : Parser s ParsedPoint
 address =
-    LocationAddress <$> regex "[^/@]+"
+    PointAddress <$> regex "[^/@]+"

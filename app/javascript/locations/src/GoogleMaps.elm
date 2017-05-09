@@ -4,18 +4,18 @@ port module GoogleMaps
         , focusMarker
         , unfocusMarker
         , updateMarkerTitle
-        , newStop
-        , existingStop
+        , newLocation
+        , existingLocation
         , clearMarkers
         , doubleClickMap
         , MapPoint
         )
 
-import Stops.Models exposing (Stop(..), StopId, CompleteStop, extractStopId, toCompleteStop)
+import Locations.Models exposing (Location(..), LocationId, CompleteLocation, extractLocationId, toCompleteLocation)
 
 
 type alias MapPoint =
-    { id : StopId
+    { id : LocationId
     , latitude : Float
     , longitude : Float
     , name : String
@@ -24,52 +24,52 @@ type alias MapPoint =
 
 
 type alias MarkerTitle =
-    { id : StopId
+    { id : LocationId
     , name : String
     }
 
 
-newStop : String
-newStop =
-    "NEW_STOP"
+newLocation : String
+newLocation =
+    "NEW_LOCATION"
 
 
-existingStop : String
-existingStop =
-    "EXISTING_STOP"
+existingLocation : String
+existingLocation =
+    "EXISTING_LOCATION"
 
 
-drawMarker : String -> CompleteStop -> Cmd msg
-drawMarker markerType stop =
-    stopToMapPoint stop markerType |> draw
+drawMarker : String -> CompleteLocation -> Cmd msg
+drawMarker markerType location =
+    locationToMapPoint location markerType |> draw
 
 
-focusMarker : StopId -> Cmd msg
-focusMarker stopId =
-    focus stopId
+focusMarker : LocationId -> Cmd msg
+focusMarker locationId =
+    focus locationId
 
 
-unfocusMarker : StopId -> Cmd msg
-unfocusMarker stopId =
-    unfocus stopId
+unfocusMarker : LocationId -> Cmd msg
+unfocusMarker locationId =
+    unfocus locationId
 
 
-updateMarkerTitle : StopId -> String -> Cmd msg
-updateMarkerTitle stopId stopName =
-    updateTitle { id = stopId, name = stopName }
+updateMarkerTitle : LocationId -> String -> Cmd msg
+updateMarkerTitle locationId locationName =
+    updateTitle { id = locationId, name = locationName }
 
 
-clearMarkers : List Stop -> Cmd msg
-clearMarkers stops =
-    List.map extractStopId stops |> clear
+clearMarkers : List Location -> Cmd msg
+clearMarkers locations =
+    List.map extractLocationId locations |> clear
 
 
-stopToMapPoint : CompleteStop -> String -> MapPoint
-stopToMapPoint stop markerType =
-    { id = stop.id
-    , latitude = stop.latitude
-    , longitude = stop.longitude
-    , name = stop.name
+locationToMapPoint : CompleteLocation -> String -> MapPoint
+locationToMapPoint location markerType =
+    { id = location.id
+    , latitude = location.latitude
+    , longitude = location.longitude
+    , name = location.name
     , markerType = markerType
     }
 
@@ -77,16 +77,16 @@ stopToMapPoint stop markerType =
 port draw : MapPoint -> Cmd msg
 
 
-port focus : StopId -> Cmd msg
+port focus : LocationId -> Cmd msg
 
 
-port unfocus : StopId -> Cmd msg
+port unfocus : LocationId -> Cmd msg
 
 
 port updateTitle : MarkerTitle -> Cmd msg
 
 
-port clear : List StopId -> Cmd msg
+port clear : List LocationId -> Cmd msg
 
 
 port doubleClickMap : (MapPoint -> msg) -> Sub msg

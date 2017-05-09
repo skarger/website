@@ -1,4 +1,4 @@
-#stops-container {
+#locations-container {
   /* left align */
   position: absolute;
 
@@ -7,7 +7,7 @@
 }
 
 #map-container {
-  /* right align, keep in viewport while scrolling stops */
+  /* right align, keep in viewport while scrolling locations */
   position: fixed;
   right: 0px;
 
@@ -25,11 +25,11 @@
   width: 85%;
 }
 
-#stops-view div .waiting {
+#locations-view div .waiting {
   height: 50px;
 }
 
-input.stop-name {
+input.location-name {
   width: 100%;
 }
 
@@ -37,14 +37,14 @@ input.stop-name {
   visibility: hidden;
 }
 
-.stop-item {
+.location-item {
   width: 75%;
   overflow: auto;
   border: 0.4em solid;
   border-color: transparent;
 }
 
-.chosen-stop {
+.chosen-location {
   border-radius: 0.5em;
   border-color: #e0e1e2;
   background-color: #e0e1e2;

@@ -1,7 +1,7 @@
 module Models exposing (Model, emptyModel, SaveStatus(..))
 
 import Dict exposing (Dict)
-import Stops.Models exposing (StopAreaId, StopArea)
+import Locations.Models exposing (LocationAreaId, LocationArea)
 import Random.Pcg exposing (Seed)
 
 
@@ -9,7 +9,7 @@ type alias Url =
     String
 
 
-type alias StopEntry =
+type alias LocationEntry =
     String
 
 
@@ -26,10 +26,10 @@ type SaveStatus
 
 type alias Model =
     { url : Url
-    , stopAreas : Dict StopAreaId StopArea
+    , locationAreas : Dict LocationAreaId LocationArea
     , error : String
     , waiting : String
-    , stopAreaIndex : Int
+    , locationAreaIndex : Int
     , currentSeed : Seed
     , saveStatus : SaveStatus
     }
@@ -38,10 +38,10 @@ type alias Model =
 emptyModel : String -> Seed -> Model
 emptyModel waiting randomSeed =
     { url = ""
-    , stopAreas = Dict.empty
+    , locationAreas = Dict.empty
     , error = ""
     , waiting = waiting
-    , stopAreaIndex = 0
+    , locationAreaIndex = 0
     , currentSeed = randomSeed
     , saveStatus = NotAttempted
     }

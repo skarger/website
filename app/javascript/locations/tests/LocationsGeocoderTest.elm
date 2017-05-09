@@ -1,4 +1,4 @@
-module StopsGeocoderTest exposing (..)
+module LocationsGeocoderTest exposing (..)
 
 import Dict
 import Test exposing (..)
@@ -6,9 +6,9 @@ import Expect
 import Geocoding exposing (..)
 import Random.Pcg exposing (Seed, initialSeed, step)
 import Uuid exposing (uuidGenerator)
-import Stops.Models exposing (Stop)
-import Stops.Stops
-import Stops.Geocoder as StopsGeocoder
+import Locations.Models exposing (Location)
+import Locations.Locations
+import Locations.Geocoder as LocationsGeocoder
 
 
 geocodingSuccessWithAddress : Geocoding.GeocodingResult
@@ -83,9 +83,9 @@ all =
             \() ->
                 Expect.equal
                     "67 Beacon Street"
-                    (StopsGeocoder.nameFromResult geocodingSuccessWithAddress)
+                    (LocationsGeocoder.nameFromResult geocodingSuccessWithAddress)
         , test "returns the formatted address when street number and name are not present" <|
             \() ->
                 Expect.equal "67 Beacon St, Boston, MA 02108, USA"
-                    (StopsGeocoder.nameFromResult geocodingSuccessWithoutAddress)
+                    (LocationsGeocoder.nameFromResult geocodingSuccessWithoutAddress)
         ]

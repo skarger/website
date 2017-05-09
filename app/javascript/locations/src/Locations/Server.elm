@@ -1,4 +1,4 @@
-module Stops.Server exposing (fetchPossibleDuplicates, serializeStopAreas, saveStopsToServer, noContentResponse)
+module Locations.Server exposing (fetchPossibleDuplicates, serializeLocationAreas, saveLocationsToServer, noContentResponse)
 
 import Http exposing (Body, Error(..), jsonBody)
 import Json.Decode exposing (Decoder, at)
@@ -6,17 +6,17 @@ import Json.Decode.Pipeline exposing (decode, required, requiredAt, hardcoded)
 import Json.Encode exposing (Value)
 import Dict exposing (Dict)
 import Messages exposing (Msg(..))
-import Stops.Models exposing (CompleteStop, Stop(..), StopAreaId, StopArea)
+import Locations.Models exposing (CompleteLocation, Location(..), LocationAreaId, LocationArea)
 
 
-fetchPossibleDuplicates : StopAreaId -> CompleteStop -> Cmd Msg
-fetchPossibleDuplicates stopAreaId stop =
+fetchPossibleDuplicates : LocationAreaId -> CompleteLocation -> Cmd Msg
+fetchPossibleDuplicates locationAreaId location =
     let
         latitude =
-            stop.latitude
+            location.latitude
 
         longitude =
-            stop.longitude
+            location.longitude
 
         path =
             "/api/nearby_locations"
@@ -28,9 +28,9 @@ fetchPossibleDuplicates stopAreaId stop =
                 ]
 
         request =
-            Http.get (path ++ query) decodeExistingStops
+            Http.get (path ++ query) decodeExistingLocations
     in
-        Http.send (PossibleDuplicateStops stopAreaId) request
+        Http.send (PossibleDuplicateLocations locationAreaId) request
 
 
 queryString : List ( String, String ) -> String
@@ -45,13 +45,13 @@ queryString kvs =
             |> String.cons '?'
 
 
-decodeCompleteStop : Decoder CompleteStop
-decodeCompleteStop =
+decodeCompleteLocation : Decoder CompleteLocation
+decodeCompleteLocation =
     let
         drawn =
             False
     in
-        decode CompleteStop
+        decode CompleteLocation
             |> required "id" Json.Decode.string
             |> requiredAt [ "attributes" ] (Json.Decode.field "name" Json.Decode.string)
             |> requiredAt [ "attributes" ] (Json.Decode.field "latitude" Json.Decode.float)
@@ -59,47 +59,47 @@ decodeCompleteStop =
             |> hardcoded drawn
 
 
-decodeExistingStop : Decoder Stop
-decodeExistingStop =
-    Json.Decode.map ExistingStop decodeCompleteStop
+decodeExistingLocation : Decoder Location
+decodeExistingLocation =
+    Json.Decode.map ExistingLocation decodeCompleteLocation
 
 
-decodeExistingStops : Decoder (List Stop)
-decodeExistingStops =
-    Json.Decode.at [ "data" ] (Json.Decode.list decodeExistingStop)
+decodeExistingLocations : Decoder (List Location)
+decodeExistingLocations =
+    Json.Decode.at [ "data" ] (Json.Decode.list decodeExistingLocation)
 
 
-serializeStopAreas : Dict StopAreaId StopArea -> Body
-serializeStopAreas stopAreas =
-    Json.Encode.object [ ( "data", encodeStops <| chosenNewStops stopAreas ) ]
+serializeLocationAreas : Dict LocationAreaId LocationArea -> Body
+serializeLocationAreas locationAreas =
+    Json.Encode.object [ ( "data", encodeLocations <| chosenNewLocations locationAreas ) ]
         |> jsonBody
 
 
-chosenNewStops : Dict StopAreaId StopArea -> List CompleteStop
-chosenNewStops stopAreas =
+chosenNewLocations : Dict LocationAreaId LocationArea -> List CompleteLocation
+chosenNewLocations locationAreas =
     let
-        newCompleteStop stop =
-            case stop of
-                NewStop s ->
+        newCompleteLocation location =
+            case location of
+                NewLocation s ->
                     Just s
 
-                ExistingStop s ->
+                ExistingLocation s ->
                     Nothing
     in
-        Dict.values stopAreas
+        Dict.values locationAreas
             |> List.filterMap (\sa -> sa.chosen)
-            |> List.filterMap (\s -> newCompleteStop s)
+            |> List.filterMap (\s -> newCompleteLocation s)
 
 
-encodeStops : List CompleteStop -> Value
-encodeStops ss =
-    List.map encodeStop ss |> Json.Encode.list
+encodeLocations : List CompleteLocation -> Value
+encodeLocations ss =
+    List.map encodeLocation ss |> Json.Encode.list
 
 
-encodeStop : CompleteStop -> Value
-encodeStop s =
+encodeLocation : CompleteLocation -> Value
+encodeLocation s =
     Json.Encode.object
-        [ ( "type", Json.Encode.string "stops" )
+        [ ( "type", Json.Encode.string "locations" )
         , ( "id", Json.Encode.string s.id )
         , ( "attributes"
           , Json.Encode.object
@@ -111,8 +111,8 @@ encodeStop s =
         ]
 
 
-saveStopsToServer : Body -> Cmd Msg
-saveStopsToServer body =
+saveLocationsToServer : Body -> Cmd Msg
+saveLocationsToServer body =
     let
         path =
             "/api/location_collections"
@@ -123,7 +123,7 @@ saveStopsToServer body =
         request =
             Http.post path body (Json.Decode.field "errors" errorDecoder)
     in
-        Http.send SaveStopsResult request
+        Http.send SaveLocationsResult request
 
 
 noContentResponse : Result Http.Error (List (Dict String String)) -> Bool

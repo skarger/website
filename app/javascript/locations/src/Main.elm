@@ -8,13 +8,13 @@ import Dict
 import Uuid exposing (uuidGenerator)
 import Models exposing (..)
 import Messages exposing (..)
-import Stops.UrlParser exposing (parseStops)
-import Stops.Stops as Stops
-import Stops.Geocoder as StopsGeocoder
-import Stops.Models exposing (StopInput(..), Stop(..), extractStopId, toCompleteStop)
-import Stops.View as StopsView
-import Stops.AreaValidator as StopAreaValidator
-import Stops.Server exposing (serializeStopAreas, saveStopsToServer, noContentResponse)
+import Locations.UrlParser exposing (parseLocations)
+import Locations.Locations as Locations
+import Locations.Geocoder as LocationsGeocoder
+import Locations.Models exposing (LocationInput(..), Location(..), extractLocationId, toCompleteLocation)
+import Locations.View as LocationsView
+import Locations.AreaValidator as LocationAreaValidator
+import Locations.Server exposing (serializeLocationAreas, saveLocationsToServer, noContentResponse)
 import Random.Pcg exposing (Seed, initialSeed, step)
 import GoogleMaps
 
@@ -48,26 +48,26 @@ update msg model =
                 url =
                     trim userEnteredContent
             in
-                case parseStops model url of
-                    Ok ( newSeed, parsedStops ) ->
+                case parseLocations model url of
+                    Ok ( newSeed, parsedLocations ) ->
                         let
-                            newStopAreaIndex =
-                                model.stopAreaIndex + List.length parsedStops
+                            newLocationAreaIndex =
+                                model.locationAreaIndex + List.length parsedLocations
 
-                            newStopAreas =
+                            newLocationAreas =
                                 Dict.fromList <|
                                     List.indexedMap
-                                        (\i ps -> ( i + model.stopAreaIndex, Stops.initializeStopArea ps ))
-                                        parsedStops
+                                        (\i ps -> ( i + model.locationAreaIndex, Locations.initializeLocationArea ps ))
+                                        parsedLocations
                         in
                             ( { model
                                 | url = url
-                                , stopAreas = Dict.union model.stopAreas newStopAreas
+                                , locationAreas = Dict.union model.locationAreas newLocationAreas
                                 , error = ""
-                                , stopAreaIndex = newStopAreaIndex
+                                , locationAreaIndex = newLocationAreaIndex
                                 , currentSeed = newSeed
                               }
-                            , StopsGeocoder.geocodeStops newStopAreas
+                            , LocationsGeocoder.geocodeLocations newLocationAreas
                             )
 
                     Err error ->
@@ -78,22 +78,22 @@ update msg model =
                         , Cmd.none
                         )
 
-        StopsGeocoderResult stopAreaId stopArea res ->
-            StopsGeocoder.handleGeocodingResponse model stopAreaId stopArea res
+        LocationsGeocoderResult locationAreaId locationArea res ->
+            LocationsGeocoder.handleGeocodingResponse model locationAreaId locationArea res
 
-        RetryGeocoding stopAreaId ->
+        RetryGeocoding locationAreaId ->
             ( model
-            , StopsGeocoder.geocodeStops
-                (Dict.filter (\id _ -> id == stopAreaId) model.stopAreas)
+            , LocationsGeocoder.geocodeLocations
+                (Dict.filter (\id _ -> id == locationAreaId) model.locationAreas)
             )
 
-        NameChanged stopAreaId stopId name ->
+        NameChanged locationAreaId locationId name ->
             let
                 updatedModel =
-                    Stops.updateStopName name model stopAreaId stopId
+                    Locations.updateLocationName name model locationAreaId locationId
             in
-                ( StopAreaValidator.validate updatedModel stopAreaId
-                , GoogleMaps.updateMarkerTitle stopId name
+                ( LocationAreaValidator.validate updatedModel locationAreaId
+                , GoogleMaps.updateMarkerTitle locationId name
                 )
 
         DoubleClickMap coordinates ->
@@ -101,80 +101,80 @@ update msg model =
                 drawn =
                     True
 
-                stopInput =
-                    PointFromMap coordinates.id
+                locationInput =
+                    LatLngFromMap coordinates.id
                         coordinates.latitude
                         coordinates.longitude
 
                 key =
-                    model.stopAreaIndex
+                    model.locationAreaIndex
 
-                stopArea =
-                    Stops.initializeStopArea stopInput
+                locationArea =
+                    Locations.initializeLocationArea locationInput
             in
                 ( { model
-                    | stopAreas =
-                        Dict.insert key stopArea model.stopAreas
-                    , stopAreaIndex = key + 1
+                    | locationAreas =
+                        Dict.insert key locationArea model.locationAreas
+                    , locationAreaIndex = key + 1
                   }
-                , StopsGeocoder.geocodeStops (Dict.singleton key stopArea)
+                , LocationsGeocoder.geocodeLocations (Dict.singleton key locationArea)
                 )
 
-        PossibleDuplicateStops stopAreaId result ->
+        PossibleDuplicateLocations locationAreaId result ->
             case result of
-                Ok stopList ->
+                Ok locationList ->
                     let
                         updatedModel =
-                            Stops.appendPossibleDuplicates stopList model stopAreaId
+                            Locations.appendPossibleDuplicates locationList model locationAreaId
                     in
-                        ( StopAreaValidator.validate updatedModel stopAreaId
-                        , Stops.drawPossibleDuplicates stopList
+                        ( LocationAreaValidator.validate updatedModel locationAreaId
+                        , Locations.drawPossibleDuplicates locationList
                         )
 
                 Err error ->
                     ( model, Cmd.none )
 
-        FocusStop stopId ->
-            ( model, GoogleMaps.focusMarker stopId )
+        FocusLocation locationId ->
+            ( model, GoogleMaps.focusMarker locationId )
 
-        UnfocusStop stopId ->
-            ( model, GoogleMaps.unfocusMarker stopId )
+        UnfocusLocation locationId ->
+            ( model, GoogleMaps.unfocusMarker locationId )
 
-        ChooseStop stopAreaId chosenStopId ->
+        ChooseLocation locationAreaId chosenLocationId ->
             let
                 updatedModel =
-                    Stops.updateStopChosen model stopAreaId chosenStopId
+                    Locations.updateLocationChosen model locationAreaId chosenLocationId
             in
-                ( StopAreaValidator.validate updatedModel stopAreaId
-                , Stops.refocusStopArea updatedModel stopAreaId chosenStopId
+                ( LocationAreaValidator.validate updatedModel locationAreaId
+                , Locations.refocusLocationArea updatedModel locationAreaId chosenLocationId
                 )
 
-        RemoveStopEntry stopAreaId ->
-            Stops.removeStopArea model stopAreaId
+        RemoveLocationEntry locationAreaId ->
+            Locations.removeLocationArea model locationAreaId
 
-        ClearStops ->
+        ClearLocations ->
             let
-                stopAreaStops sa =
-                    Dict.values sa.stops
+                locationAreaLocations sa =
+                    Dict.values sa.locations
 
-                stops =
-                    Dict.values model.stopAreas
-                        |> List.concatMap stopAreaStops
+                locations =
+                    Dict.values model.locationAreas
+                        |> List.concatMap locationAreaLocations
             in
                 ( emptyModel model.waiting
                     (model.currentSeed |> step uuidGenerator |> Tuple.second)
-                , GoogleMaps.clearMarkers stops
+                , GoogleMaps.clearMarkers locations
                 )
 
-        SaveStops ->
+        SaveLocations ->
             let
-                -- assumes that stop areas have been validated before this message
+                -- assumes that location areas have been validated before this message
                 requestBody =
-                    serializeStopAreas model.stopAreas
+                    serializeLocationAreas model.locationAreas
             in
-                ( { model | saveStatus = Saving }, saveStopsToServer requestBody )
+                ( { model | saveStatus = Saving }, saveLocationsToServer requestBody )
 
-        SaveStopsResult result ->
+        SaveLocationsResult result ->
             if noContentResponse result then
                 ( { model | saveStatus = Success }, Cmd.none )
             else
@@ -212,5 +212,5 @@ view model =
         , div [ id "errors" ] [ text (model.error) ]
         , div [] []
         , div [ class "ui hidden divider" ] []
-        , div [ id "stops-view" ] (StopsView.view model)
+        , div [ id "locations-view" ] (LocationsView.view model)
         ]

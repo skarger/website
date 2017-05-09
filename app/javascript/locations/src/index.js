@@ -6,32 +6,32 @@ require('semantic-ui-css/semantic.min.css')
 
 require("./css/styles.css");
 var waiting = require("./img/waiting.gif");
-var StopsMap = require("./stopsMap.js");
+var LocationsMap = require("./locationsMap.js");
 import App from './Main'
 
 var setupPorts = function(app) {
     app.ports.draw.subscribe(function(location) {
         var shouldZoomToFit = true;
-        StopsMap.drawStopMarker(location, shouldZoomToFit);
+        LocationsMap.drawLocationMarker(location, shouldZoomToFit);
     });
 
-    app.ports.focus.subscribe(function(stopId) {
-        StopsMap.focusMarker(stopId);
+    app.ports.focus.subscribe(function(locationId) {
+        LocationsMap.focusMarker(locationId);
     });
 
-    app.ports.unfocus.subscribe(function(stopId) {
-        StopsMap.unfocusMarker(stopId);
+    app.ports.unfocus.subscribe(function(locationId) {
+        LocationsMap.unfocusMarker(locationId);
     });
 
     app.ports.updateTitle.subscribe(function(markerTitle) {
-        StopsMap.updateMarkerTitle(markerTitle);
+        LocationsMap.updateMarkerTitle(markerTitle);
     });
 
-    app.ports.clear.subscribe(function(stopIds) {
-        StopsMap.clearMarkers(stopIds);
+    app.ports.clear.subscribe(function(locationIds) {
+        LocationsMap.clearMarkers(locationIds);
     });
 
-    StopsMap.registerDoubleClickMapHandler(function(pointOnMap) {
+    LocationsMap.registerDoubleClickMapHandler(function(pointOnMap) {
         app.ports.doubleClickMap.send(pointOnMap);
     });
 };
@@ -48,14 +48,14 @@ var randomInt = function() {
 
 
 // make available to google maps script tag as callback
-window.stopsEntryApp = function() {
+window.locationsEntryApp = function() {
 
-    var mountNode = document.getElementById('stops-container');
+    var mountNode = document.getElementById('locations-container');
 
     var app = App.Main.embed(mountNode, {
         waiting: waiting,
         randomInt: randomInt()
     });
     setupPorts(app);
-    StopsMap.initMap();
+    LocationsMap.initMap();
 }

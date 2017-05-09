@@ -4,10 +4,10 @@ import Test
 import Test.Runner.Node exposing (run, TestProgram)
 import Json.Encode exposing (Value)
 import UrlParserTest
-import StopsGeocoderTest
+import LocationsGeocoderTest
 import UuidHelpersTest
-import StopAreaValidatorTest
-import StopServerTest
+import LocationAreaValidatorTest
+import LocationServerTest
 
 
 main : TestProgram
@@ -16,9 +16,9 @@ main =
         Test.concat
             [ UrlParserTest.all
             , UuidHelpersTest.all
-            , StopsGeocoderTest.all
-            , StopAreaValidatorTest.all
-            , StopServerTest.all
+            , LocationsGeocoderTest.all
+            , LocationAreaValidatorTest.all
+            , LocationServerTest.all
             ]
 
 

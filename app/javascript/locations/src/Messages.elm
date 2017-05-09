@@ -3,21 +3,21 @@ module Messages exposing (Msg(..))
 import Http
 import Dict exposing (Dict)
 import Geocoding
-import Stops.Models exposing (StopAreaId, StopArea, StopId, Stop)
+import Locations.Models exposing (LocationAreaId, LocationArea, LocationId, Location)
 import GoogleMaps exposing (MapPoint)
 
 
 type Msg
     = EnterUrl String
-    | StopsGeocoderResult StopAreaId StopArea (Result Http.Error Geocoding.Response)
-    | RetryGeocoding StopAreaId
-    | NameChanged StopAreaId StopId String
+    | LocationsGeocoderResult LocationAreaId LocationArea (Result Http.Error Geocoding.Response)
+    | RetryGeocoding LocationAreaId
+    | NameChanged LocationAreaId LocationId String
     | DoubleClickMap MapPoint
-    | PossibleDuplicateStops StopAreaId (Result Http.Error (List Stop))
-    | FocusStop StopId
-    | UnfocusStop StopId
-    | ChooseStop StopAreaId StopId
-    | ClearStops
-    | SaveStops
-    | SaveStopsResult (Result Http.Error (List (Dict String String)))
-    | RemoveStopEntry StopAreaId
+    | PossibleDuplicateLocations LocationAreaId (Result Http.Error (List Location))
+    | FocusLocation LocationId
+    | UnfocusLocation LocationId
+    | ChooseLocation LocationAreaId LocationId
+    | ClearLocations
+    | SaveLocations
+    | SaveLocationsResult (Result Http.Error (List (Dict String String)))
+    | RemoveLocationEntry LocationAreaId

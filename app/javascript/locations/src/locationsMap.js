@@ -6,8 +6,8 @@ module.exports = (function (uuidGenerator) {
     var publicFunctions = {};
     var map;
     var markers = {};
-    const NEW_STOP = "NEW_STOP";
-    const EXISTING_STOP = "EXISTING_STOP";
+    const NEW_LOCATION = "NEW_LOCATION";
+    const EXISTING_LOCATION = "EXISTING_LOCATION";
     var doubleClickMapHandler = function() {return;}
     publicFunctions.generateUuid = uuidGenerator;
 
@@ -47,10 +47,10 @@ module.exports = (function (uuidGenerator) {
             latitude: e.latLng.lat(),
             longitude: e.latLng.lng(),
             name: "",
-            markerType: NEW_STOP,
+            markerType: NEW_LOCATION,
         };
         var shouldZoomToFit = false;
-        this.drawStopMarker(pointOnMap, shouldZoomToFit);
+        this.drawLocationMarker(pointOnMap, shouldZoomToFit);
         doubleClickMapHandler(pointOnMap);
     };
 
@@ -63,7 +63,7 @@ module.exports = (function (uuidGenerator) {
         map.addListener('dblclick', this.onDoubleClickMap.bind(this));
     };
 
-    publicFunctions.drawStopMarker = function(location, shouldZoomToFit) {
+    publicFunctions.drawLocationMarker = function(location, shouldZoomToFit) {
         var position = {
             lat: location.latitude,
             lng: location.longitude,
@@ -74,7 +74,7 @@ module.exports = (function (uuidGenerator) {
             map: map,
             title: location.name,
         };
-        if (location.markerType == EXISTING_STOP) {
+        if (location.markerType == EXISTING_LOCATION) {
             markerOptions['opacity'] = unfocusedOpacity();
         } else {
             markerOptions['opacity'] = focusedOpacity();
@@ -92,15 +92,15 @@ module.exports = (function (uuidGenerator) {
         }
     }
 
-    publicFunctions.focusMarker = function(stopId) {
-        var marker = markers[stopId];
+    publicFunctions.focusMarker = function(locationId) {
+        var marker = markers[locationId];
         if (marker) {
             marker.setOpacity(focusedOpacity());
         }
     }
 
-    publicFunctions.unfocusMarker = function(stopId) {
-        var marker = markers[stopId];
+    publicFunctions.unfocusMarker = function(locationId) {
+        var marker = markers[locationId];
         if (marker) {
             marker.setOpacity(unfocusedOpacity());
         }
@@ -113,10 +113,10 @@ module.exports = (function (uuidGenerator) {
         }
     }
 
-    publicFunctions.clearMarkers = function(stopIds) {
-        stopIds.forEach(function(stopId) {
-            markers[stopId].setMap(null);
-            delete markers[stopId];
+    publicFunctions.clearMarkers = function(locationIds) {
+        locationIds.forEach(function(locationId) {
+            markers[locationId].setMap(null);
+            delete markers[locationId];
         });
     };
 

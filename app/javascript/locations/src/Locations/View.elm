@@ -1,4 +1,4 @@
-module Stops.View exposing (view)
+module Locations.View exposing (view)
 
 import Html exposing (Html, node, div, span, text, img, input, button, h3)
 import Html.Attributes exposing (id, src, class, value, style, title)
@@ -7,31 +7,31 @@ import Json.Decode
 import Dict exposing (Dict)
 import Models exposing (Model, SaveStatus(..))
 import Messages exposing (Msg(..))
-import Stops.Models
+import Locations.Models
     exposing
-        ( StopInput(..)
-        , StopArea
-        , StopAreaId
-        , Stop(..)
-        , StopAreaStatus(..)
-        , CompleteStop
-        , toCompleteStop
-        , stopIsChosen
+        ( LocationInput(..)
+        , LocationArea
+        , LocationAreaId
+        , Location(..)
+        , LocationAreaStatus(..)
+        , CompleteLocation
+        , toCompleteLocation
+        , locationIsChosen
         )
-import Stops.AreaValidator as StopAreaValidator exposing (allValid)
+import Locations.AreaValidator as LocationAreaValidator exposing (allValid)
 
 
 view : Model -> List (Html Msg)
 view model =
-    if Dict.isEmpty model.stopAreas then
+    if Dict.isEmpty model.locationAreas then
         []
     else
-        [ div [ class "ui segments" ] (stopAreaRows model)
+        [ div [ class "ui segments" ] (locationAreaRows model)
         , div [ class "ui hidden divider" ] []
         , div [ class "ui grid" ]
             [ div [ class "two column row" ]
                 [ div [ class "left floated column" ]
-                    [ button [ class "ui red button", onClick ClearStops ] [ text "Clear Locations" ]
+                    [ button [ class "ui red button", onClick ClearLocations ] [ text "Clear Locations" ]
                     ]
                 , div [ class "right floated column" ] (saveButton model)
                 ]
@@ -46,11 +46,11 @@ saveButtonLabel : Model -> List (Html Msg)
 saveButtonLabel model =
     let
         unsteadyState model =
-            Dict.values model.stopAreas
+            Dict.values model.locationAreas
                 |> List.map .status
                 |> List.any (flip List.member [ Initialized, FetchingPossibleDuplicates ])
     in
-        case (unsteadyState model || StopAreaValidator.allValid model) of
+        case (unsteadyState model || LocationAreaValidator.allValid model) of
             True ->
                 case model.saveStatus of
                     Failure ->
@@ -76,7 +76,7 @@ saveButton : Model -> List (Html Msg)
 saveButton model =
     let
         buttonClass =
-            case ( model.saveStatus, StopAreaValidator.allValid model ) of
+            case ( model.saveStatus, LocationAreaValidator.allValid model ) of
                 ( Saving, _ ) ->
                     "ui blue right floated loading button"
 
@@ -90,25 +90,25 @@ saveButton model =
                     "ui blue disabled right floated button"
     in
         [ button
-            [ class buttonClass, onClick SaveStops ]
+            [ class buttonClass, onClick SaveLocations ]
             [ text "Save Locations" ]
         ]
 
 
-stopAreaRows : Model -> List (Html Msg)
-stopAreaRows model =
+locationAreaRows : Model -> List (Html Msg)
+locationAreaRows model =
     let
         rowNumbers =
-            List.range 1 (Dict.size model.stopAreas)
+            List.range 1 (Dict.size model.locationAreas)
     in
-        Dict.toList model.stopAreas
+        Dict.toList model.locationAreas
             |> List.sortBy (Tuple.first)
             |> List.map2 (,) rowNumbers
-            |> List.map (\( row, ( idx, sa ) ) -> stopAreaRow model row idx sa)
+            |> List.map (\( row, ( idx, sa ) ) -> locationAreaRow model row idx sa)
 
 
-stopAreaRow : Model -> Int -> StopAreaId -> StopArea -> Html Msg
-stopAreaRow model rowNumber saId sa =
+locationAreaRow : Model -> Int -> LocationAreaId -> LocationArea -> Html Msg
+locationAreaRow model rowNumber saId sa =
     case sa.status of
         Initialized ->
             waitingRow model rowNumber saId
@@ -117,70 +117,70 @@ stopAreaRow model rowNumber saId sa =
             geocodeFailureRow rowNumber saId sa message
 
         GeocodeSuccess ->
-            stopAreaDataRow model rowNumber saId sa
+            locationAreaDataRow model rowNumber saId sa
 
         FetchingPossibleDuplicates ->
             waitingRow model rowNumber saId
 
         otherwise ->
-            stopAreaDataRow model rowNumber saId sa
+            locationAreaDataRow model rowNumber saId sa
 
 
-stopAreaDataRow : Model -> Int -> StopAreaId -> StopArea -> Html Msg
-stopAreaDataRow model rowNumber stopAreaId stopArea =
+locationAreaDataRow : Model -> Int -> LocationAreaId -> LocationArea -> Html Msg
+locationAreaDataRow model rowNumber locationAreaId locationArea =
     let
         ( es, ns ) =
             Dict.partition
                 (\id s ->
                     case s of
-                        ExistingStop s ->
+                        ExistingLocation s ->
                             True
 
                         otherwise ->
                             False
                 )
-                stopArea.stops
+                locationArea.locations
 
-        newStop =
+        newLocation =
             Dict.values ns |> List.head
 
-        existingStops =
+        existingLocations =
             Dict.values es
 
         inputRow =
-            case newStop of
-                Just stop ->
-                    [ newStopItem stopAreaId
-                        stopArea
-                        stop
-                        (List.length existingStops > 0)
+            case newLocation of
+                Just location ->
+                    [ newLocationItem locationAreaId
+                        locationArea
+                        location
+                        (List.length existingLocations > 0)
                     ]
 
                 otherwise ->
                     []
     in
-        stopAreaRowDiv rowNumber
-            stopAreaId
-            ((stopAreaTopRow stopArea)
-                ++ stopAreaMainRow rowNumber
-                    stopAreaId
+        locationAreaRowDiv rowNumber
+            locationAreaId
+            ((locationAreaTopRow locationArea)
+                ++ locationAreaMainRow rowNumber
+                    locationAreaId
                     [ div [ class "ui divided list" ] <|
                         (inputRow
                             ++ (possibleDuplicateList
-                                    stopAreaId
-                                    stopArea
-                                    existingStops
+                                    locationAreaId
+                                    locationArea
+                                    existingLocations
                                )
                         )
                     ]
             )
 
 
-stopAreaTopRow : StopArea -> List (Html Msg)
-stopAreaTopRow stopArea =
+locationAreaTopRow : LocationArea -> List (Html Msg)
+locationAreaTopRow locationArea =
     let
         messageLabel =
-            case stopArea.status of
+            case locationArea.status of
                 Invalid message ->
                     [ errorMessage message ]
 
@@ -192,12 +192,12 @@ stopAreaTopRow stopArea =
         ]
 
 
-stopAreaMainRow : Int -> StopAreaId -> List (Html Msg) -> List (Html Msg)
-stopAreaMainRow rowNumber stopAreaId content =
+locationAreaMainRow : Int -> LocationAreaId -> List (Html Msg) -> List (Html Msg)
+locationAreaMainRow rowNumber locationAreaId content =
     [ div [ class "one wide middle aligned center aligned column" ]
         [ button
             [ class "ui red tiny compact button"
-            , onClick <| RemoveStopEntry stopAreaId
+            , onClick <| RemoveLocationEntry locationAreaId
             ]
             [ text "X" ]
         ]
@@ -207,14 +207,14 @@ stopAreaMainRow rowNumber stopAreaId content =
     ]
 
 
-waitingRow : Model -> Int -> StopAreaId -> Html Msg
-waitingRow model rowNumber stopAreaId =
-    stopAreaRowDiv rowNumber stopAreaId [ waitingItem model ]
+waitingRow : Model -> Int -> LocationAreaId -> Html Msg
+waitingRow model rowNumber locationAreaId =
+    locationAreaRowDiv rowNumber locationAreaId [ waitingItem model ]
 
 
-stopAreaRowDiv : Int -> StopAreaId -> List (Html Msg) -> Html Msg
-stopAreaRowDiv rowNumber stopAreaId content =
-    div [ class "ui padded blue segment", id (toString stopAreaId) ]
+locationAreaRowDiv : Int -> LocationAreaId -> List (Html Msg) -> Html Msg
+locationAreaRowDiv rowNumber locationAreaId content =
+    div [ class "ui padded blue segment", id (toString locationAreaId) ]
         [ div [ class "ui grid" ] content ]
 
 
@@ -223,10 +223,10 @@ waitingItem model =
     div [] [ img [ class "waiting", src model.waiting ] [] ]
 
 
-chooseButton : StopAreaId -> CompleteStop -> Html Msg
-chooseButton stopAreaId s =
+chooseButton : LocationAreaId -> CompleteLocation -> Html Msg
+chooseButton locationAreaId s =
     div [ class "right floated content" ]
-        [ div [ class "small ui button", onClick (ChooseStop stopAreaId s.id) ]
+        [ div [ class "small ui button", onClick (ChooseLocation locationAreaId s.id) ]
             [ text "Choose" ]
         ]
 
@@ -244,32 +244,32 @@ errorMessage err =
     div [ class "ui red large basic label" ] [ text err ]
 
 
-stopItemAttributes : StopArea -> Stop -> List (Html.Attribute Msg)
-stopItemAttributes stopArea stop =
+locationItemAttributes : LocationArea -> Location -> List (Html.Attribute Msg)
+locationItemAttributes locationArea location =
     let
         alwaysFocus =
             [ class "item" ]
 
         mouseOverFocus s =
-            [ class "item", onMouseOver (FocusStop s.id), onMouseLeave (UnfocusStop s.id) ]
+            [ class "item", onMouseOver (FocusLocation s.id), onMouseLeave (UnfocusLocation s.id) ]
     in
-        case ( stopArea.chosen, stop ) of
-            ( Nothing, NewStop s ) ->
+        case ( locationArea.chosen, location ) of
+            ( Nothing, NewLocation s ) ->
                 alwaysFocus
 
-            ( Nothing, ExistingStop s ) ->
+            ( Nothing, ExistingLocation s ) ->
                 mouseOverFocus s
 
-            ( Just _, NewStop s ) ->
-                case stopIsChosen stopArea stop of
+            ( Just _, NewLocation s ) ->
+                case locationIsChosen locationArea location of
                     True ->
                         alwaysFocus
 
                     False ->
                         mouseOverFocus s
 
-            ( Just _, ExistingStop s ) ->
-                case stopIsChosen stopArea stop of
+            ( Just _, ExistingLocation s ) ->
+                case locationIsChosen locationArea location of
                     True ->
                         alwaysFocus
 
@@ -277,12 +277,12 @@ stopItemAttributes stopArea stop =
                         mouseOverFocus s
 
 
-stopItemClass : StopArea -> Stop -> String
-stopItemClass stopArea stop =
-    if stopIsChosen stopArea stop then
-        "stop-item chosen-stop"
+locationItemClass : LocationArea -> Location -> String
+locationItemClass locationArea location =
+    if locationIsChosen locationArea location then
+        "location-item chosen-location"
     else
-        "stop-item"
+        "location-item"
 
 
 onBlurWithTargetValue : (String -> msg) -> Html.Attribute msg
@@ -290,17 +290,17 @@ onBlurWithTargetValue tagger =
     on "blur" (Json.Decode.map tagger targetValue)
 
 
-newStopItem : StopAreaId -> StopArea -> Stop -> Bool -> Html Msg
-newStopItem stopAreaId stopArea stop possibleDuplicatesExist =
+newLocationItem : LocationAreaId -> LocationArea -> Location -> Bool -> Html Msg
+newLocationItem locationAreaId locationArea location possibleDuplicatesExist =
     let
         s =
-            toCompleteStop stop
+            toCompleteLocation location
 
-        stopInput =
-            (div [ class ("ui input " ++ (stopItemClass stopArea stop)) ]
+        locationInput =
+            (div [ class ("ui input " ++ (locationItemClass locationArea location)) ]
                 [ input
-                    [ class "stop-name"
-                    , onBlurWithTargetValue (NameChanged stopAreaId s.id)
+                    [ class "location-name"
+                    , onBlurWithTargetValue (NameChanged locationAreaId s.id)
                     , value s.name
                     ]
                     []
@@ -311,40 +311,40 @@ newStopItem stopAreaId stopArea stop possibleDuplicatesExist =
             -- right floated button needs to be before input to align correctly
             case possibleDuplicatesExist of
                 False ->
-                    [ spacerButton, stopInput ]
+                    [ spacerButton, locationInput ]
 
                 True ->
-                    [ chooseButton stopAreaId s, stopInput ]
+                    [ chooseButton locationAreaId s, locationInput ]
     in
-        div ([ id s.id ] ++ (stopItemAttributes stopArea stop)) content
+        div ([ id s.id ] ++ (locationItemAttributes locationArea location)) content
 
 
-possibleDuplicateList : StopAreaId -> StopArea -> List Stop -> List (Html Msg)
-possibleDuplicateList stopAreaId stopArea pds =
+possibleDuplicateList : LocationAreaId -> LocationArea -> List Location -> List (Html Msg)
+possibleDuplicateList locationAreaId locationArea pds =
     case List.isEmpty pds of
         True ->
             []
 
         False ->
             div [ class "ui sub header" ] [ text "Nearby Locations" ]
-                :: List.map (possibleDuplicateItem stopAreaId stopArea) pds
+                :: List.map (possibleDuplicateItem locationAreaId locationArea) pds
 
 
-possibleDuplicateItem : StopAreaId -> StopArea -> Stop -> Html Msg
-possibleDuplicateItem stopAreaId stopArea pd =
+possibleDuplicateItem : LocationAreaId -> LocationArea -> Location -> Html Msg
+possibleDuplicateItem locationAreaId locationArea pd =
     let
         cs =
-            toCompleteStop pd
+            toCompleteLocation pd
     in
         div
-            ([ id cs.id ] ++ (stopItemAttributes stopArea pd))
-            [ div [ class "right floated content" ] [ chooseButton stopAreaId cs ]
-            , div [ class (stopItemClass stopArea pd) ] [ text cs.name ]
+            ([ id cs.id ] ++ (locationItemAttributes locationArea pd))
+            [ div [ class "right floated content" ] [ chooseButton locationAreaId cs ]
+            , div [ class (locationItemClass locationArea pd) ] [ text cs.name ]
             ]
 
 
-geocodeFailureRow : Int -> StopAreaId -> StopArea -> String -> Html Msg
-geocodeFailureRow rowNumber stopAreaId stopArea err =
+geocodeFailureRow : Int -> LocationAreaId -> LocationArea -> String -> Html Msg
+geocodeFailureRow rowNumber locationAreaId locationArea err =
     let
         message =
             errorMessage err
@@ -352,32 +352,32 @@ geocodeFailureRow rowNumber stopAreaId stopArea err =
         formatCoordinates lat lng =
             "( " ++ String.join ", " [ toString lat, toString lng ] ++ " )"
 
-        ( name, stopId ) =
-            case stopArea.stopInput of
+        ( name, locationId ) =
+            case locationArea.locationInput of
                 Address id a ->
                     ( a, id )
 
-                PointFromUrl id lat lng ->
+                LatLngFromUrl id lat lng ->
                     ( formatCoordinates lat lng, id )
 
-                PointFromMap id lat lng ->
+                LatLngFromMap id lat lng ->
                     ( formatCoordinates lat lng, id )
 
         retryButton =
-            div [ class "ui small button", onClick (RetryGeocoding stopAreaId) ] [ text "Retry" ]
+            div [ class "ui small button", onClick (RetryGeocoding locationAreaId) ] [ text "Retry" ]
 
-        location =
+        enteredPoint =
             div [] [ text <| name ]
     in
-        stopAreaRowDiv rowNumber
-            stopAreaId
-            (stopAreaMainRow rowNumber
-                stopAreaId
+        locationAreaRowDiv rowNumber
+            locationAreaId
+            (locationAreaMainRow rowNumber
+                locationAreaId
                 [ message
                 , div [ class "ui divided list" ]
-                    [ div [ id stopId, class "item" ]
+                    [ div [ id locationId, class "item" ]
                         [ div [ class "right floated content" ] [ retryButton ]
-                        , location
+                        , enteredPoint
                         ]
                     ]
                 ]
