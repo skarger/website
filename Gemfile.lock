@@ -1,7 +1,6 @@
 GIT
-  remote: git://github.com/skarger/webpacker.git
-  revision: 2f6a3b3fd20114b6dd9feac920c14e262b242e37
-  branch: elm-compile-debug-env
+  remote: git://github.com/rails/webpacker.git
+  revision: 90ba29b1e5f26f1dbff32296623851cd653dbf32
   specs:
     webpacker (1.2)
       activesupport (>= 4.2)
