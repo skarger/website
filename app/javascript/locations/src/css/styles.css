@@ -22,7 +22,11 @@
 }
 
 .url-entry {
-  width: 85%;
+  width: 80%;
+}
+
+.double-click-map {
+  float: right;
 }
 
 #locations-view div .waiting {

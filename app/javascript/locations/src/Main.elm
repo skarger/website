@@ -208,6 +208,8 @@ view model =
                     ]
                     []
                 ]
+            , div [ class "ui horizontal divider" ] [ text "Or" ]
+            , div [ class "double-click-map ui right pointing large label" ] [ text "Double Click Map" ]
             ]
         , div [ id "errors" ] [ text (model.error) ]
         , div [] []
