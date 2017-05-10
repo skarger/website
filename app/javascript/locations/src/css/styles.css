@@ -21,6 +21,10 @@
   width: 100%;
 }
 
+.input-intro {
+  margin-bottom: 5%;
+}
+
 .url-entry {
   width: 80%;
 }

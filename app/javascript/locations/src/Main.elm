@@ -199,18 +199,21 @@ view : Model -> Html Msg
 view model =
     div [ id "main" ]
         [ h3 [ id "main-heading" ] [ text "Locations Entry" ]
-        , div [ class "urls-section" ]
-            [ div
-                [ class "ui input url-entry" ]
-                [ input
-                    [ onInput EnterUrl
-                    , placeholder "Enter Google Maps Directions Url"
+        , div [ class "input-intro" ]
+            [ div [ class "urls-section" ]
+                [ div
+                    [ class "ui input url-entry" ]
+                    [ input
+                        [ onInput EnterUrl
+                        , placeholder "Enter Google Maps Directions Url"
+                        ]
+                        []
                     ]
-                    []
                 ]
             , div [ class "ui horizontal divider" ] [ text "Or" ]
             , div [ class "double-click-map ui right pointing large label" ] [ text "Double Click Map" ]
             ]
+        , div [ class "ui hidden divider" ] []
         , div [ id "errors" ] [ text (model.error) ]
         , div [] []
         , div [ class "ui hidden divider" ] []
