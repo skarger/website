@@ -8,14 +8,14 @@ import Dict
 import Uuid exposing (uuidGenerator)
 import Models exposing (..)
 import Messages exposing (..)
+import MessageHandlers exposing (..)
 import Locations.UrlParser exposing (parseLocations)
 import Locations.Locations as Locations
 import Locations.Geocoder as LocationsGeocoder
-import Locations.Models exposing (LocationInput(..), Location(..), extractLocationId, toCompleteLocation)
 import Locations.View as LocationsView
 import Locations.AreaValidator as LocationAreaValidator
 import Locations.Server exposing (serializeLocationAreas, saveLocationsToServer, noContentResponse)
-import Random.Pcg exposing (Seed, initialSeed, step)
+import Random.Pcg exposing (initialSeed, step)
 import GoogleMaps
 
 
@@ -48,35 +48,7 @@ update msg model =
                 url =
                     trim userEnteredContent
             in
-                case parseLocations model url of
-                    Ok ( newSeed, parsedLocations ) ->
-                        let
-                            newLocationAreaIndex =
-                                model.locationAreaIndex + List.length parsedLocations
-
-                            newLocationAreas =
-                                Dict.fromList <|
-                                    List.indexedMap
-                                        (\i ps -> ( i + model.locationAreaIndex, Locations.initializeLocationArea ps ))
-                                        parsedLocations
-                        in
-                            ( { model
-                                | url = url
-                                , locationAreas = Dict.union model.locationAreas newLocationAreas
-                                , error = ""
-                                , locationAreaIndex = newLocationAreaIndex
-                                , currentSeed = newSeed
-                              }
-                            , LocationsGeocoder.geocodeLocations newLocationAreas
-                            )
-
-                    Err error ->
-                        ( { model
-                            | url = url
-                            , error = error
-                          }
-                        , Cmd.none
-                        )
+                parseLocations model url |> integrateParsedLocations model url
 
         LocationsGeocoderResult locationAreaId locationArea res ->
             LocationsGeocoder.handleGeocodingResponse model locationAreaId locationArea res
@@ -97,28 +69,7 @@ update msg model =
                 )
 
         DoubleClickMap coordinates ->
-            let
-                drawn =
-                    True
-
-                locationInput =
-                    LatLngFromMap coordinates.id
-                        coordinates.latitude
-                        coordinates.longitude
-
-                key =
-                    model.locationAreaIndex
-
-                locationArea =
-                    Locations.initializeLocationArea locationInput
-            in
-                ( { model
-                    | locationAreas =
-                        Dict.insert key locationArea model.locationAreas
-                    , locationAreaIndex = key + 1
-                  }
-                , LocationsGeocoder.geocodeLocations (Dict.singleton key locationArea)
-                )
+            integrateDoubleClickLocation model coordinates
 
         PossibleDuplicateLocations locationAreaId result ->
             case result of
