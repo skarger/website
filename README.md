@@ -1,36 +1,31 @@
-== README
+Personal Website
+==
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Setup
 
-Things you may want to cover:
+### System dependencies
+* Ruby version: 2.4.1
+* Postgres 9.6 with PostGIS extension enabled. On Mac I recommend [Postgres.app](https://postgresapp.com/).
+* Elm
+* Yarn
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
+### Database creation
 ```
-rspec
+$ psql
+=# CREATE ROLE website WITH SUPERUSER PASSWORD 'website';
+=# \q
+
+$ rails db:create
+$ rails db:gis:setup
+$ rails db:migrate
 ```
 
-* Services (job queues, cache servers, search engines, etc.)
+### Run Tests
+```
+$ rspec
+```
 
-* Deployment instructions
-
-Create `website` role in Postgres with superuser.
-`rails db:gis:setup`
-
-`git push origin master`
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+### Deployment
+```
+git push origin master
+```
