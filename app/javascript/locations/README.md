@@ -21,11 +21,11 @@ I built this app 90% with Elm, a statically-typed pure functional language that 
 
 ### Backend
 Two API endpoints compose the backend:
-1. GET /api/nearby_locations to search for possible duplicates locations
-        - Production code: https://github.com/skarger/website/blob/master/app/controllers/api/nearby_locations_controller.rb
-        - Tests: https://github.com/skarger/website/blob/master/spec/requests/api/nearby_locations_spec.rb
-2. POST /api/location_collections to create the set of new locations
-        - Production code: https://github.com/skarger/website/blob/master/app/controllers/api/location_collections_controller.rb
-        - Tests: https://github.com/skarger/website/blob/master/spec/requests/api/location_collections_spec.rb
+1. `GET /api/nearby_locations` to search for possible duplicates locations
+  * Production code: https://github.com/skarger/website/blob/master/app/controllers/api/nearby_locations_controller.rb
+  * Tests: https://github.com/skarger/website/blob/master/spec/requests/api/nearby_locations_spec.rb
+2. `POST /api/location_collections` to create the set of new locations
+  * Production code: https://github.com/skarger/website/blob/master/app/controllers/api/location_collections_controller.rb
+  * Tests: https://github.com/skarger/website/blob/master/spec/requests/api/location_collections_spec.rb
 
 Maybe the most interesting detail on the backend is that the nearby_locations endpoint utilizes PostGIS to perform a geo-query for lat/lngs.
