@@ -25,6 +25,12 @@ $ rails db:migrate
 $ rspec
 ```
 
+### Run Local Server
+```
+$ rails server
+$ bin/webpack-dev-server
+```
+
 ### Deployment
 ```
 git push origin master
