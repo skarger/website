@@ -14,7 +14,7 @@ import Locations.Locations as Locations
 import Locations.Geocoder as LocationsGeocoder
 import Locations.View as LocationsView
 import Locations.AreaValidator as LocationAreaValidator
-import Locations.Server exposing (serializeLocationAreas, saveLocationsToServer, noContentResponse)
+import Locations.Server exposing (serializeLocations, saveLocationsToServer, noContentResponse)
 import Random.Pcg exposing (initialSeed, step)
 import GoogleMaps
 
@@ -121,7 +121,7 @@ update msg model =
             let
                 -- assumes that location areas have been validated before this message
                 requestBody =
-                    serializeLocationAreas model.locationAreas
+                    serializeLocations <| Locations.chosenNewLocations model.locationAreas
             in
                 ( { model | saveStatus = Saving }, saveLocationsToServer requestBody )
 

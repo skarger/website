@@ -19,6 +19,7 @@ import Locations.Models
         , locationIsChosen
         )
 import Locations.AreaValidator as LocationAreaValidator exposing (allValid)
+import Locations.Locations as Locations
 
 
 view : Model -> List (Html Msg)
@@ -75,15 +76,24 @@ saveButtonLabel model =
 saveButton : Model -> List (Html Msg)
 saveButton model =
     let
+        newLocationCount =
+            Locations.chosenNewLocations model.locationAreas
+                |> List.length
+
         buttonClass =
-            case ( model.saveStatus, LocationAreaValidator.allValid model ) of
-                ( Saving, _ ) ->
+            case
+                ( model.saveStatus
+                , LocationAreaValidator.allValid model
+                , newLocationCount > 0
+                )
+            of
+                ( Saving, _, _ ) ->
                     "ui blue right floated loading button"
 
-                ( NotAttempted, True ) ->
+                ( NotAttempted, True, True ) ->
                     "ui blue right floated button"
 
-                ( Failure, True ) ->
+                ( Failure, True, True ) ->
                     "ui blue right floated button"
 
                 otherwise ->

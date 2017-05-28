@@ -8,6 +8,7 @@ import LocationsGeocoderTest
 import UuidHelpersTest
 import LocationAreaValidatorTest
 import LocationServerTest
+import LocationsTest
 
 
 main : TestProgram
@@ -19,6 +20,7 @@ main =
             , LocationsGeocoderTest.all
             , LocationAreaValidatorTest.all
             , LocationServerTest.all
+            , LocationsTest.all
             ]
 
 

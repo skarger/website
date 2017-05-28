@@ -1,4 +1,4 @@
-module Locations.Server exposing (fetchPossibleDuplicates, serializeLocationAreas, saveLocationsToServer, noContentResponse)
+module Locations.Server exposing (fetchPossibleDuplicates, serializeLocations, saveLocationsToServer, noContentResponse)
 
 import Http exposing (Body, Error(..), jsonBody)
 import Json.Decode exposing (Decoder, at)
@@ -63,26 +63,10 @@ decodeExistingLocations =
     Json.Decode.at [ "data" ] (Json.Decode.list decodeExistingLocation)
 
 
-serializeLocationAreas : Dict LocationAreaId LocationArea -> Body
-serializeLocationAreas locationAreas =
-    Json.Encode.object [ ( "data", encodeLocations <| chosenNewLocations locationAreas ) ]
+serializeLocations : List CompleteLocation -> Body
+serializeLocations newLocations =
+    Json.Encode.object [ ( "data", encodeLocations newLocations ) ]
         |> jsonBody
-
-
-chosenNewLocations : Dict LocationAreaId LocationArea -> List CompleteLocation
-chosenNewLocations locationAreas =
-    let
-        newCompleteLocation location =
-            case location of
-                NewLocation l ->
-                    Just l
-
-                ExistingLocation l ->
-                    Nothing
-    in
-        Dict.values locationAreas
-            |> List.filterMap (\la -> la.chosen)
-            |> List.filterMap (\l -> newCompleteLocation l)
 
 
 encodeLocations : List CompleteLocation -> Value

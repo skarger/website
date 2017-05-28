@@ -5,6 +5,7 @@ module Locations.Locations
         , drawPossibleDuplicates
         , updateLocationName
         , appendPossibleDuplicates
+        , chosenNewLocations
         , removeLocationArea
         , updateLocationChosen
         , updateLocationArea
@@ -143,6 +144,22 @@ refocusLocationArea model locationAreaId chosenLocationId =
         List.map GoogleMaps.focusMarker [ chosenLocationId ]
             ++ List.map GoogleMaps.unfocusMarker unchosenLocations
             |> Cmd.batch
+
+
+chosenNewLocations : Dict LocationAreaId LocationArea -> List CompleteLocation
+chosenNewLocations locationAreas =
+    let
+        newCompleteLocation location =
+            case location of
+                NewLocation l ->
+                    Just l
+
+                ExistingLocation l ->
+                    Nothing
+    in
+        Dict.values locationAreas
+            |> List.filterMap (\la -> la.chosen)
+            |> List.filterMap (\l -> newCompleteLocation l)
 
 
 removeLocationArea : Model -> LocationAreaId -> ( Model, Cmd msg )

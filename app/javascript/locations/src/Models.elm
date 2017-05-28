@@ -9,14 +9,6 @@ type alias Url =
     String
 
 
-type alias LocationEntry =
-    String
-
-
-type alias LineNumber =
-    Int
-
-
 type SaveStatus
     = NotAttempted
     | Saving
