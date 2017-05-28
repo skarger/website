@@ -12,19 +12,13 @@ import Locations.Models exposing (CompleteLocation, Location(..), LocationAreaId
 fetchPossibleDuplicates : LocationAreaId -> CompleteLocation -> Cmd Msg
 fetchPossibleDuplicates locationAreaId location =
     let
-        latitude =
-            location.latitude
-
-        longitude =
-            location.longitude
-
         path =
             "/api/nearby_locations"
 
         query =
             queryString
-                [ ( "latitude", toString latitude )
-                , ( "longitude", toString longitude )
+                [ ( "latitude", toString location.latitude )
+                , ( "longitude", toString location.longitude )
                 ]
 
         request =
@@ -80,32 +74,32 @@ chosenNewLocations locationAreas =
     let
         newCompleteLocation location =
             case location of
-                NewLocation s ->
-                    Just s
+                NewLocation l ->
+                    Just l
 
-                ExistingLocation s ->
+                ExistingLocation l ->
                     Nothing
     in
         Dict.values locationAreas
-            |> List.filterMap (\sa -> sa.chosen)
-            |> List.filterMap (\s -> newCompleteLocation s)
+            |> List.filterMap (\la -> la.chosen)
+            |> List.filterMap (\l -> newCompleteLocation l)
 
 
 encodeLocations : List CompleteLocation -> Value
-encodeLocations ss =
-    List.map encodeLocation ss |> Json.Encode.list
+encodeLocations ls =
+    List.map encodeLocation ls |> Json.Encode.list
 
 
 encodeLocation : CompleteLocation -> Value
-encodeLocation s =
+encodeLocation l =
     Json.Encode.object
         [ ( "type", Json.Encode.string "locations" )
-        , ( "id", Json.Encode.string s.id )
+        , ( "id", Json.Encode.string l.id )
         , ( "attributes"
           , Json.Encode.object
-                [ ( "name", Json.Encode.string s.name )
-                , ( "latitude", Json.Encode.float s.latitude )
-                , ( "longitude", Json.Encode.float s.longitude )
+                [ ( "name", Json.Encode.string l.name )
+                , ( "latitude", Json.Encode.float l.latitude )
+                , ( "longitude", Json.Encode.float l.longitude )
                 ]
           )
         ]
