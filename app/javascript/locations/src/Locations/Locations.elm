@@ -88,10 +88,10 @@ appendPossibleDuplicates pds model locationAreaId =
             Maybe.map (extractLocationInputId << .locationInput) locationArea
     in
         case ( locationArea, newLocationId ) of
-            ( Just sa, Just id ) ->
+            ( Just la, Just id ) ->
                 let
                     updatedModel =
-                        updatePossibleDuplicates pds model locationAreaId sa
+                        updatePossibleDuplicates pds model locationAreaId la
                 in
                     case List.length pds of
                         0 ->
@@ -195,11 +195,11 @@ updateLocationChosen model locationAreaId locationId =
                 |> Maybe.andThen (Dict.get locationId)
     in
         case locationArea of
-            Just sa ->
+            Just la ->
                 updateLocationArea
                     model
                     locationAreaId
-                    (overwriteWith { sa | chosen = newChosenLocation })
+                    (overwriteWith { la | chosen = newChosenLocation })
 
             Nothing ->
                 model
@@ -209,15 +209,15 @@ updateLocation : (CompleteLocation -> CompleteLocation) -> (Model -> LocationAre
 updateLocation updater =
     \model locationAreaId locationId ->
         (case Dict.get locationAreaId model.locationAreas of
-            Just sa ->
+            Just la ->
                 let
                     modelWithLocationUpdated =
                         updateLocationArea
                             model
                             locationAreaId
-                            ((updateLocationAttribute updater sa locationId) |> overwriteWith)
+                            ((updateLocationAttribute updater la locationId) |> overwriteWith)
                 in
-                    replicateChangeToChosen modelWithLocationUpdated locationAreaId sa locationId
+                    replicateChangeToChosen modelWithLocationUpdated locationAreaId la locationId
 
             Nothing ->
                 model

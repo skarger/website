@@ -37,16 +37,16 @@ geocodeLocation locationAreaId locationArea =
 
 
 geocodingRequest : LocationAreaId -> LocationArea -> Cmd Msg
-geocodingRequest id sa =
-    case sa.locationInput of
+geocodingRequest id la =
+    case la.locationInput of
         Address _ a ->
-            forwardGeocode id sa a
+            forwardGeocode id la a
 
         LatLngFromUrl _ lat lng ->
-            reverseGeocode id sa lat lng
+            reverseGeocode id la lat lng
 
         LatLngFromMap _ lat lng ->
-            reverseGeocode id sa lat lng
+            reverseGeocode id la lat lng
 
 
 reverseGeocode : LocationAreaId -> LocationArea -> Float -> Float -> Cmd Msg
@@ -91,11 +91,11 @@ handleGeocodingResponse model locationAreaId locationArea response =
                     Dict.get locationAreaId updatedModel.locationAreas
             in
                 case updatedLocationArea of
-                    Just sa ->
+                    Just la ->
                         Locations.afterSuccessfulGeocode
                             updatedModel
                             locationAreaId
-                            sa
+                            la
                             (toCompleteLocation location)
 
                     Nothing ->

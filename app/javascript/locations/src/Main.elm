@@ -105,12 +105,10 @@ update msg model =
 
         ClearLocations ->
             let
-                locationAreaLocations sa =
-                    Dict.values sa.locations
-
                 locations =
                     Dict.values model.locationAreas
-                        |> List.concatMap locationAreaLocations
+                        |> List.map .locations
+                        |> List.concatMap Dict.values
             in
                 ( emptyModel model.waiting
                     (model.currentSeed |> step uuidGenerator |> Tuple.second)

@@ -114,26 +114,26 @@ locationAreaRows model =
         Dict.toList model.locationAreas
             |> List.sortBy (Tuple.first)
             |> List.map2 (,) rowNumbers
-            |> List.map (\( row, ( idx, sa ) ) -> locationAreaRow model row idx sa)
+            |> List.map (\( row, ( idx, la ) ) -> locationAreaRow model row idx la)
 
 
 locationAreaRow : Model -> Int -> LocationAreaId -> LocationArea -> Html Msg
-locationAreaRow model rowNumber saId sa =
-    case sa.status of
+locationAreaRow model rowNumber laId la =
+    case la.status of
         Initialized ->
-            waitingRow model rowNumber saId
+            waitingRow model rowNumber laId
 
         GeocodeFailure message ->
-            geocodeFailureRow rowNumber saId sa message
+            geocodeFailureRow rowNumber laId la message
 
         GeocodeSuccess ->
-            locationAreaDataRow model rowNumber saId sa
+            locationAreaDataRow model rowNumber laId la
 
         FetchingPossibleDuplicates ->
-            waitingRow model rowNumber saId
+            waitingRow model rowNumber laId
 
         otherwise ->
-            locationAreaDataRow model rowNumber saId sa
+            locationAreaDataRow model rowNumber laId la
 
 
 locationAreaDataRow : Model -> Int -> LocationAreaId -> LocationArea -> Html Msg

@@ -36,10 +36,10 @@ validate model locationAreaId =
 
 
 validateLocationArea : LocationArea -> LocationArea
-validateLocationArea sa =
-    case sa.chosen of
+validateLocationArea la =
+    case la.chosen of
         Nothing ->
-            ({ sa | status = Invalid "Please choose a location" })
+            ({ la | status = Invalid "Please choose a location" })
 
         Just s ->
             let
@@ -49,4 +49,4 @@ validateLocationArea sa =
                     else
                         Valid
             in
-                ({ sa | status = status })
+                ({ la | status = status })
