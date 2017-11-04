@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "/api/location_collections", type: :request do
   it "responds with 422 if invalid data given" do
     post_data = {
-      'data': []
+      'spots': []
     }
     post api_location_collections_path, params: post_data
     expect(response.code).to eq("400")
@@ -14,6 +14,14 @@ describe "/api/location_collections", type: :request do
         detail: "invalid location data"
       }]
     })
+  end
+
+  it "handles an empty list of locations" do
+    post_data = {
+      'data': []
+    }
+    post api_location_collections_path, params: post_data
+    expect(response.code).to eq("204")
   end
 
   it "writes locations to DB" do

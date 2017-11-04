@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe UsersController, :type => :controller do
   context "production" do
     before :each do
-      allow(Rails).to receive_message_chain(:env, :production?).and_return(true)
+      allow(Rails.env).to receive(:production?).and_return(true)
     end
 
     it 'should block the user new endpoint' do

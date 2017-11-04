@@ -19,7 +19,7 @@ class Api::LocationCollectionsController < Api::BaseController
   private
 
   def locations_params
-    params.require(:data).map do |d|
+    params.require(:data).reject(&:blank?).map do |d|
       d.permit(:id).merge(
         d.require(:attributes).permit(:name, :latitude, :longitude)
       )
