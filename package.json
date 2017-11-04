@@ -1,11 +1,13 @@
 {
   "dependencies": {
+    "@rails/webpacker": "^3.0.2",
     "autoprefixer": "^7.0.1",
     "babel-core": "^6.24.1",
     "babel-loader": "7.x",
     "babel-preset-env": "^1.4.0",
     "coffee-loader": "^0.7.3",
     "coffee-script": "^1.12.5",
+    "coffeescript": "1.12.7",
     "compression-webpack-plugin": "^0.4.0",
     "css-loader": "^0.28.1",
     "elm": "^0.18.0",
@@ -30,7 +32,7 @@
   "devDependencies": {
     "elm-hot-loader": "^0.5.4",
     "elm-webpack-loader": "^4.3.1",
-    "webpack-dev-server": "^2.4.5"
+    "webpack-dev-server": "^2.9.4"
   },
   "scripts": {
     "test": "elm-test app/javascript/locations/tests/Main.elm",
