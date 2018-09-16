@@ -54,4 +54,4 @@ group :test do
   gem 'json_expressions'
 end
 
-ruby '2.4.1'
+ruby '2.5.1'
