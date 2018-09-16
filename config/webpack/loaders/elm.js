@@ -1,18 +1,23 @@
-const path = require('path')
-const { env } = require('../configuration.js')
+const { resolve } = require('path')
 
-const elmSource = path.resolve(process.cwd())
+const isProduction = process.env.NODE_ENV === 'production'
+const elmSource = resolve(process.cwd())
+const elmMake = `${elmSource}/node_modules/.bin/elm-make`
 
-const loaderOptions = () => {
-  if (env.NODE_ENV === 'production') {
-    return `elm-webpack-loader?cwd=${elmSource}`
-  }
+const elmDefaultOptions = { cwd: elmSource, pathToMake: elmMake }
+const developmentOptions = Object.assign({}, elmDefaultOptions, {
+  verbose: true,
+  warn: true,
+  debug: true
+})
 
-  return `elm-hot-loader!elm-webpack-loader?cwd=${elmSource}&verbose=true&warn=true&debug=true`
+const elmWebpackLoader = {
+  loader: 'elm-webpack-loader',
+  options: isProduction ? elmDefaultOptions : developmentOptions
 }
 
 module.exports = {
-  test: /\.elm$/,
+  test: /\.elm(\.erb)?$/,
   exclude: [/elm-stuff/, /node_modules/],
-  loader: loaderOptions()
+  use: isProduction ? [elmWebpackLoader] : [{ loader: 'elm-hot-loader' }, elmWebpackLoader]
 }
