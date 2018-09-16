@@ -71,7 +71,6 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json_expressions (0.9.0)
-    kgio (2.11.2)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -95,6 +94,7 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    puma (3.12.0)
     rack (2.0.5)
     rack-proxy (0.6.4)
       rack
@@ -134,7 +134,6 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
-    raindrops (0.19.0)
     rake (12.3.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
@@ -191,9 +190,6 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.1.19)
       execjs (>= 0.3.0, < 3)
-    unicorn (5.4.1)
-      kgio (~> 2.6)
-      raindrops (~> 0.7)
     webpacker (3.5.5)
       activesupport (>= 4.2)
       rack-proxy (>= 0.6.1)
@@ -214,6 +210,7 @@ DEPENDENCIES
   listen
   pg
   pry
+  puma
   rack-timeout
   rails (~> 5.2)
   rails-controller-testing
@@ -223,7 +220,6 @@ DEPENDENCIES
   spring
   turbolinks
   uglifier
-  unicorn
   webpacker
 
 RUBY VERSION

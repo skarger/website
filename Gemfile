@@ -28,9 +28,6 @@ gem 'spring',        group: :development
 # Use ActiveModel has_secure_password
 gem 'bcrypt'
 
-# Use unicorn as the app server
-# gem 'unicorn'
-
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
@@ -38,8 +35,8 @@ gem 'bcrypt'
 # gem 'debugger', group: [:development, :test]
 
 group 'production' do
+  gem 'puma'
   gem 'rails_12factor'
-  gem 'unicorn'
   gem 'rack-timeout'
 end
 
