@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@rails/webpacker": "^3.0.2",
+    "@rails/webpacker": "3.5",
     "autoprefixer": "^7.0.1",
     "babel-core": "^6.24.1",
     "babel-loader": "7.x",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "elm-hot-loader": "^0.5.4",
     "elm-webpack-loader": "^4.4.0",
-    "webpack-dev-server": "^2.9.4"
+    "webpack-dev-server": "2.11.2"
   },
   "scripts": {
     "test": "elm-test app/javascript/locations/tests/Main.elm",
