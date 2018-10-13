@@ -19,10 +19,6 @@ Rails.application.routes.draw do
     root 'base#index'
   end
 
-  resource :locations, only: [:show]
-
   namespace :api do
-    resource :nearby_locations, only: [:show]
-    resources :location_collections, only: [:create]
   end
 end

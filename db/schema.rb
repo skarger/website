@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170508141407) do
+ActiveRecord::Schema.define(version: 2018_10_13_185711) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,16 +24,6 @@ ActiveRecord::Schema.define(version: 20170508141407) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["distance_workout_id"], name: "index_distance_runs_on_distance_workout_id"
-  end
-
-  create_table "locations", force: :cascade do |t|
-    t.text "name"
-    t.geography "point", limit: {:srid=>4326, :type=>"st_point", :geographic=>true}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.uuid "uuid", default: -> { "uuid_generate_v4()" }
-    t.index ["point"], name: "index_locations_on_point"
-    t.index ["uuid"], name: "index_locations_on_uuid", unique: true
   end
 
   create_table "track_intervals", id: :serial, force: :cascade do |t|
