@@ -1,4 +1,6 @@
-class ElmDemo::BaseController < ApplicationController
-  def index
+module ElmDemo
+  class BaseController < ApplicationController
+    def index
+    end
   end
 end

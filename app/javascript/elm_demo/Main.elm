@@ -1,45 +1,69 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), Score(..), init, main, onUrlChange, onUrlRequest, points, reaction, reactionItem, row, scoreItem, update, view, viewAlways, viewCode, viewContent, viewHome, viewLink, viewSidebar)
 
+import Browser exposing (UrlRequest(..))
+import Browser.Navigation
 import Html
     exposing
         ( Html
-        , h1
-        , button
-        , div
-        , span
-        , text
-        , pre
-        , code
         , a
-        , ul
+        , button
+        , code
+        , div
+        , h1
         , li
         , p
+        , pre
+        , span
         , table
-        , thead
         , tbody
-        , th
-        , tr
         , td
+        , text
+        , th
+        , thead
+        , tr
+        , ul
         )
-import Html.Attributes exposing (id, class, href, attribute)
+import Html.Attributes exposing (attribute, class, href, id)
 import Html.Events exposing (onClick)
-import Navigation
 import Ports
+import Url exposing (Url)
 
 
-main : Program Never Model Msg
+namespace : String
+namespace =
+    "elm_demo"
+
+
+pageTitle : String
+pageTitle =
+    "Website"
+
+
+main : Program () Model Msg
 main =
-    Navigation.program UrlChange
+    Browser.application
         { init = init
         , update = update
         , view = view
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = \_ -> Sub.none
+        , onUrlRequest = onUrlRequest
+        , onUrlChange = onUrlChange
         }
 
 
-init : Navigation.Location -> ( Model, Cmd msg )
-init location =
-    ( Model [ location ] [], Ports.highlightCode Ports.emptyOptions )
+init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd msg )
+init flags url key =
+    ( Model [] url key, Ports.highlightCode Ports.emptyOptions )
+
+
+onUrlRequest : Browser.UrlRequest -> Msg
+onUrlRequest request =
+    ClickedLink request
+
+
+onUrlChange : Url -> Msg
+onUrlChange url =
+    UrlChange url
 
 
 
@@ -53,15 +77,9 @@ type Score
 
 
 type alias Model =
-    { history : List Navigation.Location
-    , scores : List Score
-    }
-
-
-model : Model
-model =
-    { history = []
-    , scores = []
+    { scores : List Score
+    , currentUrl : Url
+    , key : Browser.Navigation.Key
     }
 
 
@@ -70,7 +88,8 @@ model =
 
 
 type Msg
-    = UrlChange Navigation.Location
+    = ClickedLink Browser.UrlRequest
+    | UrlChange Url
     | Reset
     | AddTouchdown
     | AddExtraPoint
@@ -80,12 +99,20 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UrlChange location ->
-            let
-                updatedHistory =
-                    location :: model.history
-            in
-                ( { model | history = updatedHistory }, Ports.highlightCode Ports.emptyOptions )
+        ClickedLink urlRequest ->
+            case urlRequest of
+                Internal url ->
+                    if String.contains namespace <| Url.toString url then
+                        ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
+
+                    else
+                        ( model, Browser.Navigation.load <| Url.toString url )
+
+                External url ->
+                    ( model, Browser.Navigation.load url )
+
+        UrlChange url ->
+            ( { model | currentUrl = url }, Ports.highlightCode Ports.emptyOptions )
 
         Reset ->
             ( { model | scores = [] }, Cmd.none )
@@ -131,7 +158,7 @@ row score =
 scoreItem : Score -> Html Msg
 scoreItem score =
     points score
-        |> toString
+        |> String.fromInt
         |> text
         |> List.singleton
         |> td []
@@ -145,20 +172,36 @@ reactionItem score =
         |> td []
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div [ id "main-grid" ] <|
-        List.append
-            [ div [ class "header" ] [ h1 [] [ text "Elm Package Demos" ] ]
-            , div [ class "sidebar" ] viewSidebar
-            ]
-            (case List.head model.history of
-                Just location ->
-                    viewContent model (location.pathname ++ location.hash)
+    let
+        mainBody =
+            List.append
+                [ div [ class "header" ] [ h1 [] [ text "Elm Package Demos" ] ]
+                , div [ class "sidebar" ] viewSidebar
+                ]
+                (case model.currentUrl.fragment of
+                    Just fragment ->
+                        viewContent model fragment
 
-                Nothing ->
-                    viewHome
-            )
+                    Nothing ->
+                        viewHome
+                )
+    in
+    { title = pageTitle
+    , body = [ viewNav, div [ id "main-grid" ] mainBody ]
+    }
+
+
+viewNav : Html Msg
+viewNav =
+    div [ class "nav_container" ]
+        [ ul [ class "nav_list" ]
+            [ li [ class "" ] [ a [ class "nav_list", href "/" ] [ text "/" ] ]
+            , li [ class "" ] [ a [ class "nav_list", href "/about" ] [ text "ABOUT" ] ]
+            , li [ class "" ] [ a [ class "nav_list", href "/login" ] [ text "LOG IN" ] ]
+            ]
+        ]
 
 
 viewSidebar : List (Html Msg)
@@ -186,7 +229,7 @@ viewSidebar =
 viewContent : Model -> String -> List (Html Msg)
 viewContent model location =
     case location of
-        "/elm_demo#always" ->
+        "always" ->
             viewAlways model
 
         otherwise ->
@@ -206,7 +249,7 @@ viewHome =
                 [ text """
         This demo area is an Elm SPA itself, using the
         """
-                , a [ href "http://package.elm-lang.org/packages/elm-lang/navigation/latest" ] [ text "Navigation" ]
+                , a [ href "https://package.elm-lang.org/packages/elm/browser/latest/Browser-Navigation" ] [ text "Browser.Navigation" ]
                 , text " package for routing."
                 ]
             ]
@@ -271,8 +314,3 @@ reaction =
 viewLink : String -> Html msg
 viewLink name =
     li [] [ a [ href ("#" ++ name), attribute "data-turbolinks" "false" ] [ text name ] ]
-
-
-viewLocation : Navigation.Location -> Html msg
-viewLocation location =
-    li [] [ text (location.pathname ++ location.hash) ]

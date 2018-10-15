@@ -1,8 +1,8 @@
-import App from './Main'
+import { Elm } from './Main.elm';
 
 $(document).ready(() => {
   var node = document.getElementById('main');
-  var app = App.Main.embed(node);
+  var app = Elm.Main.init({node: node});
 
   app.ports.highlightCode.subscribe(function(options) {
     var highlightPoller = setInterval(function() {

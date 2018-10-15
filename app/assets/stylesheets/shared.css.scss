@@ -26,7 +26,8 @@ h1 {
     width: 50%;
     margin-left: auto;
     margin-right: auto;
-    text-align: center;
+    display: flex;
+    justify-content: space-evenly;
 
 
     a {
@@ -34,11 +35,10 @@ h1 {
     }
 
     li {
-        display: inline;
         list-style-type: none;
-        margin-left: 5%;
-        margin-right: 5%;
         padding: 1%;
+        max-width: min-content;
+        white-space: nowrap;
     }
 
     li.current {
