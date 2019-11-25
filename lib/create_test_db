@@ -1,5 +1,0 @@
-#!/bin/bash
-
-createdb --user postgres website_test
-RAILS_ENV=test bundle exec rake db:migrate
-
