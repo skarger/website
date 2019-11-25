@@ -22,7 +22,8 @@ fn register_templates() -> Result<Handlebars<'static>> {
     let res =
         template_registry.register_template_file("application", "./src/templates/partials/application.hbs")
             .and_then(|_| { template_registry.register_template_file("header", "./src/templates/partials/header.hbs") })
-        .and_then(|_| { template_registry.register_template_file("home", "./src/templates/home.hbs") })
+            .and_then(|_| { template_registry.register_template_file("home", "./src/templates/home.hbs") })
+            .and_then(|_| { template_registry.register_template_file("404", "./src/templates/404.hbs") })
             .and_then(|_| { template_registry.register_template_file("about", "./src/templates/about.hbs") });
     if res.is_err() {
         panic!("Could not register template")
@@ -55,8 +56,14 @@ fn charles() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/images/charles-river-compressed.png")?)
 }
 
-fn p404() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/404.html")?.set_status_code(StatusCode::NOT_FOUND))
+fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
+    let context = json!({
+        "currentPage": "404",
+        "title": "Not Found",
+    });
+    Ok(HttpResponse::build(StatusCode::NOT_FOUND)
+        .content_type("text/html; charset=utf-8")
+        .body(data.template_registry.render("404", &context).unwrap()))
 }
 
 #[get("/")]
