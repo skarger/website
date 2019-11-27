@@ -104,14 +104,14 @@ fn main() -> io::Result<()> {
         .parse()
         .expect("PORT must be a number");
 
-    let redirect_https = app_environment == "production" || app_environment == "staging";
+    let redirect_to_https = app_environment == "production" || app_environment == "staging";
 
     let mut server = HttpServer::new(move || {
         App::new()
             .data(AppState {
                 template_registry: register_templates().unwrap(),
             })
-            .wrap(middleware::Condition::new(redirect_https, RedirectHTTPS::default()))
+            .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             // register favicon
