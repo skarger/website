@@ -10,6 +10,7 @@ use handlebars::Handlebars;
 use listenfd::ListenFd;
 use serde_json::json;
 use std::{env, io};
+use actix_web_middleware_redirect_https::RedirectHTTPS;
 
 struct AppState {
     pub template_registry: Handlebars<'static>,
@@ -94,17 +95,23 @@ fn main() -> io::Result<()> {
 
     let mut listenfd = ListenFd::from_env();
 
+    let app_environment = env::var("APP_ENVIRONMENT")
+        .unwrap_or_else(|_| "development".to_string());
+
     // Get the port number to listen on.
     let port = env::var("PORT")
         .unwrap_or_else(|_| "8080".to_string())
         .parse()
         .expect("PORT must be a number");
 
-    let mut server = HttpServer::new(|| {
+    let redirect_to_https = app_environment == "production" || app_environment == "staging";
+
+    let mut server = HttpServer::new(move || {
         App::new()
             .data(AppState {
                 template_registry: register_templates().unwrap(),
             })
+            .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             // register favicon
