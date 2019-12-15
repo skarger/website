@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate actix_web;
+#[macro_use]
+extern crate diesel;
 
 use actix_files as fs;
 use actix_web::http::{StatusCode};
@@ -15,6 +17,12 @@ use std::{env, io};
 use actix_web_middleware_redirect_https::RedirectHTTPS;
 use diesel::Connection;
 
+pub mod schema;
+pub mod models;
+
+use self::models::{Message,NewMessage};
+use self::diesel::prelude::*;
+
 struct AppState {
     pub template_registry: Handlebars<'static>,
 }
@@ -28,6 +36,7 @@ fn register_templates() -> Result<Handlebars<'static>> {
             .and_then(|_| { template_registry.register_template_file("header", "./src/templates/partials/header.hbs") })
             .and_then(|_| { template_registry.register_template_file("home", "./src/templates/home.hbs") })
             .and_then(|_| { template_registry.register_template_file("404", "./src/templates/404.hbs") })
+            .and_then(|_| { template_registry.register_template_file("messages", "./src/templates/messages.hbs") })
             .and_then(|_| { template_registry.register_template_file("about", "./src/templates/about.hbs") });
     if res.is_err() {
         panic!("Could not register template")
@@ -43,6 +52,34 @@ pub fn establish_connection() -> PgConnection {
         .expect("DATABASE_URL must be set");
     PgConnection::establish(&database_url)
         .expect(&format!("Error connecting to {}", database_url))
+}
+
+fn latest_messages(connection: &PgConnection) -> Vec<Message> {
+    use self::schema::messages::dsl::*;
+
+    let latest_messages = messages.filter(message_group.eq("1"))
+        .order(created_at.desc())
+        .limit(1)
+        .load::<Message>(connection)
+        .expect("Error loading messages");
+
+    latest_messages
+}
+
+fn create_message<'a>(connection: &PgConnection, message_group: &'a str, body: &'a str, index: &'a i32, message_author: &'a str) -> Message {
+    use self::schema::messages;
+
+    let new_message = NewMessage {
+        message_group: message_group,
+        body: body,
+        index: index,
+        message_author: message_author,
+    };
+
+    diesel::insert_into(messages::table)
+        .values(&new_message)
+        .get_result(connection)
+        .expect("Error saving new message")
 }
 
 fn serve_favicon() -> Result<fs::NamedFile> {
@@ -101,6 +138,24 @@ fn about(data: web::Data<AppState>) -> Result<HttpResponse> {
         .body(data.template_registry.render("about", &context).unwrap()))
 }
 
+#[get("/messages")]
+fn messages(data: web::Data<AppState>) -> Result<HttpResponse> {
+    let connection = establish_connection();
+    let messages = latest_messages(&connection);
+
+    let context = json!({
+        "currentPage": "messages",
+        "title": "Messages",
+        "body": messages[0].body,
+    });
+
+    create_message(&connection, "1", "hello world", &1, "a");
+
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(data.template_registry.render("messages", &context).unwrap()))
+}
+
 fn main() -> io::Result<()> {
     dotenv().ok();
     env::set_var("RUST_LOG", "actix_web=debug");
@@ -136,6 +191,7 @@ fn main() -> io::Result<()> {
             // register simple route, handle all methods
             .service(home)
             .service(about)
+            .service(messages)
             .default_service(
                 // 404 for GET request
                 web::resource("")
