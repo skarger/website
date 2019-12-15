@@ -10,6 +10,7 @@ edition = "2018"
 actix-web = "1.0"
 actix-files = "0.1.1"
 actix-web-middleware-redirect-https = "0.1.1"
+diesel = { version = "1.4.3", features = ["postgres"] }
 env_logger = "0.7.1"
 handlebars = "3.0.0-beta.1"
 listenfd = "0.3.3"
