@@ -6,12 +6,14 @@ use actix_web::http::{StatusCode};
 use actix_web::{
     guard, middleware, web, App, HttpResponse, HttpServer, Result,
 };
+use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use handlebars::Handlebars;
 use listenfd::ListenFd;
 use serde_json::json;
 use std::{env, io};
 use actix_web_middleware_redirect_https::RedirectHTTPS;
+use diesel::Connection;
 
 struct AppState {
     pub template_registry: Handlebars<'static>,
@@ -32,6 +34,15 @@ fn register_templates() -> Result<Handlebars<'static>> {
     }
 
     Ok(template_registry)
+}
+
+pub fn establish_connection() -> PgConnection {
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+    PgConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url))
 }
 
 fn serve_favicon() -> Result<fs::NamedFile> {
