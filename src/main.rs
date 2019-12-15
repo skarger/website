@@ -6,6 +6,7 @@ use actix_web::http::{StatusCode};
 use actix_web::{
     guard, middleware, web, App, HttpResponse, HttpServer, Result,
 };
+use dotenv::dotenv;
 use handlebars::Handlebars;
 use listenfd::ListenFd;
 use serde_json::json;
@@ -90,6 +91,7 @@ fn about(data: web::Data<AppState>) -> Result<HttpResponse> {
 }
 
 fn main() -> io::Result<()> {
+    dotenv().ok();
     env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
 
