@@ -13,6 +13,7 @@ use dotenv::dotenv;
 use handlebars::Handlebars;
 use listenfd::ListenFd;
 use serde_json::json;
+use serde::Deserialize;
 use std::{env, io};
 use actix_web_middleware_redirect_https::RedirectHTTPS;
 use diesel::Connection;
@@ -25,6 +26,12 @@ use self::diesel::prelude::*;
 
 struct AppState {
     pub template_registry: Handlebars<'static>,
+}
+
+#[derive(Deserialize)]
+struct MessagePayload {
+    pub index: i32,
+    pub body: String,
 }
 
 // Registers the Handlebars templates for the application.
@@ -54,10 +61,23 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-fn latest_messages(connection: &PgConnection) -> Vec<Message> {
+fn load_message_body(connection: &PgConnection, _message_group: &String, message_index: i32) -> String {
+    let messages: Vec<Message>  = latest_messages(connection, message_index);
+
+    let mut body = String::new();
+    if messages.len() > 0 {
+        match &messages[0].body {
+            Some(val) => body = val.to_owned(),
+            None => {}
+        }
+    }
+    body
+}
+
+fn latest_messages(connection: &PgConnection, message_index: i32) -> Vec<Message> {
     use self::schema::messages::dsl::*;
 
-    let latest_messages = messages.filter(message_group.eq("1"))
+    let latest_messages = messages.filter(index.eq(message_index))
         .order(created_at.desc())
         .limit(1)
         .load::<Message>(connection)
@@ -101,6 +121,16 @@ fn css() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/style.css")?)
 }
 
+#[get("/quill/quill.min.js")]
+fn quill_js() -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("static/quill/quill.min.js")?)
+}
+
+#[get("/quill/quill.snow.css")]
+fn quill_css() -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("static/quill/quill.snow.css")?)
+}
+
 #[get("/images/charles-river-compressed.png")]
 fn charles() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/images/charles-river-compressed.png")?)
@@ -138,22 +168,68 @@ fn about(data: web::Data<AppState>) -> Result<HttpResponse> {
         .body(data.template_registry.render("about", &context).unwrap()))
 }
 
-#[get("/messages")]
-fn messages(data: web::Data<AppState>) -> Result<HttpResponse> {
+
+fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Result<HttpResponse> {
+    let message_group = format!("{}", path);
+
     let connection = establish_connection();
-    let messages = latest_messages(&connection);
+    let message_author_0 = env::var("MESSAGE_AUTHOR_0_ID")
+        .unwrap_or_else(|_| "".to_string());
+    let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
+        .unwrap_or_else(|_| "".to_string());
+
+    let new_message_0 = NewMessage {
+        message_group: &message_group.clone(),
+        body: &load_message_body(&connection, &message_group, 0),
+        index: &0,
+        message_author: &message_author_0.clone(),
+    };
+
+    let new_message_1 = NewMessage {
+        message_group: &message_group.clone(),
+        body: &load_message_body(&connection, &message_group, 1),
+        index: &1,
+        message_author: &message_author_1.clone(),
+    };
+
+    let new_message_2 = NewMessage {
+        message_group: &message_group.clone(),
+        body: &load_message_body(&connection, &message_group, 2),
+        index: &2,
+        message_author: &message_author_1.clone(),
+    };
 
     let context = json!({
         "currentPage": "messages",
         "title": "Messages",
-        "body": messages[0].body,
+        "message_0": new_message_0.body,
+        "message_1": new_message_1.body,
+        "message_2": new_message_2.body,
+        "messageGroup": message_group,
     });
-
-    create_message(&connection, "1", "hello world", &1, "a");
 
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(data.template_registry.render("messages", &context).unwrap()))
+}
+
+fn create_message_in_group(path: web::Path<String>, message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
+    let connection = establish_connection();
+
+    let message_group = &format!("{}", path);
+
+    let key = format!("message_{}", message_payload.index);
+    let context = json!({
+        "currentPage": "messages",
+        "title": "Messages",
+        key: message_payload.body,
+    });
+
+    create_message(&connection, message_group, &"abc", &message_payload.index, "a");
+
+    Ok(HttpResponse::build(StatusCode::CREATED)
+        .content_type("application/json; charset=utf-8")
+        .json(context))
 }
 
 fn main() -> io::Result<()> {
@@ -187,11 +263,14 @@ fn main() -> io::Result<()> {
             .service(favicon_ico)
             .service(fs::Files::new("/static", "static").show_files_listing())
             .service(css)
+            .service(quill_js)
+            .service(quill_css)
             .service(charles)
             // register simple route, handle all methods
             .service(home)
             .service(about)
-            .service(messages)
+            .route("/messages/{message_group}", web::get().to(load_message_group))
+            .route("/messages/{message_group}", web::post().to(create_message_in_group))
             .default_service(
                 // 404 for GET request
                 web::resource("")
