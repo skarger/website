@@ -1,13 +1,19 @@
 {{#*inline "content"}}
     <p>
-        {{message_0}}
+        {{message0}}
     </p>
 
+    <textarea id="input1">{{message1}}</textarea>
+    <button id="button1">Save</button>
+
+    <textarea id="input2">{{message2}}</textarea>
+    <button id="button2">Save</button>
+
     <script>
-        var input_1 = document.getElementById("input_1");
-        var input_2 = document.getElementById("input_2");
-        var button_1 = document.getElementById("button_1");
-        var button_2 = document.getElementById("button_2");
+        var input1 = document.getElementById("input1");
+        var input2 = document.getElementById("input2");
+        var button1 = document.getElementById("button1");
+        var button2 = document.getElementById("button2");
 
         function handleMessage(event) {
             var xhr = new XMLHttpRequest();
@@ -22,12 +28,12 @@
             }
 
             let payload;
-            if (event.target.id === button_1.id) {
-                payload = { index: 1, body: input_1.value };
+            if (event.target.id === button1.id) {
+                payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: 1, body: input1.value };
             }
 
-            if (event.target.id === button_2.id) {
-                payload = { index: 2, body: input_2.value) };
+            if (event.target.id === button2.id) {
+                payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: 2, body: input2.value };
             }
 
             if (payload) {
@@ -35,8 +41,8 @@
             }
         }
 
-        button_1.addEventListener("click", handleMessage);
-        button_2.addEventListener("click", handleMessage);
+        button1.addEventListener("click", handleMessage);
+        button2.addEventListener("click", handleMessage);
     </script>
 {{/inline}}
 {{~> application~}}

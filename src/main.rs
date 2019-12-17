@@ -30,8 +30,10 @@ struct AppState {
 
 #[derive(Deserialize)]
 struct MessagePayload {
+    pub message_group: String,
     pub index: i32,
     pub body: String,
+    pub author: String,
 }
 
 // Registers the Handlebars templates for the application.
@@ -86,14 +88,36 @@ fn latest_messages(connection: &PgConnection, message_index: i32) -> Vec<Message
     latest_messages
 }
 
-fn create_message<'a>(connection: &PgConnection, message_group: &'a str, body: &'a str, index: &'a i32, message_author: &'a str) -> Message {
+fn create_message_in_group(path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
+    let message_group = &format!("{}", path);
+    message_payload.message_group = message_group.to_string();
+    let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
+        .unwrap_or_else(|_| "".to_string());
+    message_payload.author = message_author_1;
+
+    let key = format!("message{}", message_payload.index);
+    let context = json!({
+        "currentPage": "messages",
+        "title": "Messages",
+        key: message_payload.body,
+    });
+
+    let connection = establish_connection();
+    create_message(&connection, &message_payload);
+
+    Ok(HttpResponse::build(StatusCode::CREATED)
+        .content_type("application/json; charset=utf-8")
+        .json(context))
+}
+
+fn create_message(connection: &PgConnection, message_payload: &MessagePayload) -> Message {
     use self::schema::messages;
 
     let new_message = NewMessage {
-        message_group: message_group,
-        body: body,
-        index: index,
-        message_author: message_author,
+        message_group: &message_payload.message_group,
+        body: &message_payload.body,
+        index: &message_payload.index,
+        message_author: &message_payload.author,
     };
 
     diesel::insert_into(messages::table)
@@ -192,34 +216,17 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
     let context = json!({
         "currentPage": "messages",
         "title": "Messages",
-        "message_0": new_message_0.body,
-        "message_1": new_message_1.body,
-        "message_2": new_message_2.body,
+        "author0": "a0",
+        "author1": "a1",
+        "message0": new_message_0.body,
+        "message1": new_message_1.body,
+        "message2": new_message_2.body,
         "messageGroup": message_group,
     });
 
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(data.template_registry.render("messages", &context).unwrap()))
-}
-
-fn create_message_in_group(path: web::Path<String>, message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
-    let connection = establish_connection();
-
-    let message_group = &format!("{}", path);
-
-    let key = format!("message_{}", message_payload.index);
-    let context = json!({
-        "currentPage": "messages",
-        "title": "Messages",
-        key: message_payload.body,
-    });
-
-    create_message(&connection, message_group, &"abc", &message_payload.index, "a");
-
-    Ok(HttpResponse::build(StatusCode::CREATED)
-        .content_type("application/json; charset=utf-8")
-        .json(context))
 }
 
 fn main() -> io::Result<()> {
