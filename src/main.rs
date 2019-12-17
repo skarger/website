@@ -88,26 +88,30 @@ fn latest_messages(connection: &PgConnection, message_index: i32) -> Vec<Message
     latest_messages
 }
 
-fn create_message_in_group(path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
+fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
     let message_group = &format!("{}", path);
-    message_payload.message_group = message_group.to_string();
-    let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
-        .unwrap_or_else(|_| "".to_string());
-    message_payload.author = message_author_1;
+    if !authorized(&message_group) {
+        p404(data)
+    } else {
+        message_payload.message_group = message_group.to_string();
+        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
+            .unwrap_or_else(|_| "".to_string());
+        message_payload.author = message_author_1;
 
-    let key = format!("message{}", message_payload.index);
-    let context = json!({
-        "currentPage": "messages",
-        "title": "Messages",
-        key: message_payload.body,
-    });
+        let key = format!("message{}", message_payload.index);
+        let context = json!({
+            "currentPage": "messages",
+            "title": "Messages",
+            key: message_payload.body,
+        });
 
-    let connection = establish_connection();
-    create_message(&connection, &message_payload);
+        let connection = establish_connection();
+        create_message(&connection, &message_payload);
 
-    Ok(HttpResponse::build(StatusCode::CREATED)
-        .content_type("application/json; charset=utf-8")
-        .json(context))
+        Ok(HttpResponse::build(StatusCode::CREATED)
+            .content_type("application/json; charset=utf-8")
+            .json(context))
+    }
 }
 
 fn create_message(connection: &PgConnection, message_payload: &MessagePayload) -> Message {
@@ -182,51 +186,58 @@ fn about(data: web::Data<AppState>) -> Result<HttpResponse> {
         .body(data.template_registry.render("about", &context).unwrap()))
 }
 
-
 fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Result<HttpResponse> {
     let message_group = format!("{}", path);
+    if !authorized(&message_group) {
+        p404(data)
+    } else {
+        let connection = establish_connection();
+        let message_author_0 = env::var("MESSAGE_AUTHOR_0_ID")
+            .unwrap_or_else(|_| "".to_string());
+        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
+            .unwrap_or_else(|_| "".to_string());
 
-    let connection = establish_connection();
-    let message_author_0 = env::var("MESSAGE_AUTHOR_0_ID")
-        .unwrap_or_else(|_| "".to_string());
-    let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
-        .unwrap_or_else(|_| "".to_string());
+        let new_message_0 = NewMessage {
+            message_group: &message_group.clone(),
+            body: &load_message_body(&connection, &message_group, 0),
+            index: &0,
+            message_author: &message_author_0.clone(),
+        };
 
-    let new_message_0 = NewMessage {
-        message_group: &message_group.clone(),
-        body: &load_message_body(&connection, &message_group, 0),
-        index: &0,
-        message_author: &message_author_0.clone(),
-    };
+        let new_message_1 = NewMessage {
+            message_group: &message_group.clone(),
+            body: &load_message_body(&connection, &message_group, 1),
+            index: &1,
+            message_author: &message_author_1.clone(),
+        };
 
-    let new_message_1 = NewMessage {
-        message_group: &message_group.clone(),
-        body: &load_message_body(&connection, &message_group, 1),
-        index: &1,
-        message_author: &message_author_1.clone(),
-    };
+        let new_message_2 = NewMessage {
+            message_group: &message_group.clone(),
+            body: &load_message_body(&connection, &message_group, 2),
+            index: &2,
+            message_author: &message_author_1.clone(),
+        };
 
-    let new_message_2 = NewMessage {
-        message_group: &message_group.clone(),
-        body: &load_message_body(&connection, &message_group, 2),
-        index: &2,
-        message_author: &message_author_1.clone(),
-    };
+        let context = json!({
+            "currentPage": "messages",
+            "title": "Messages",
+            "author0": "a0",
+            "author1": "a1",
+            "message0": new_message_0.body,
+            "message1": new_message_1.body,
+            "message2": new_message_2.body,
+            "messageGroup": message_group,
+        });
 
-    let context = json!({
-        "currentPage": "messages",
-        "title": "Messages",
-        "author0": "a0",
-        "author1": "a1",
-        "message0": new_message_0.body,
-        "message1": new_message_1.body,
-        "message2": new_message_2.body,
-        "messageGroup": message_group,
-    });
+        Ok(HttpResponse::build(StatusCode::OK)
+            .content_type("text/html; charset=utf-8")
+            .body(data.template_registry.render("messages", &context).unwrap()))
+    }
+}
 
-    Ok(HttpResponse::build(StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("messages", &context).unwrap()))
+fn authorized(message_group: &str) -> bool {
+    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap();
+    message_group == allowed_message_group
 }
 
 fn main() -> io::Result<()> {
