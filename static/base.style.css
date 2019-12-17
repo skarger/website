@@ -4,14 +4,8 @@ html {
 
 body {
   height: 100%;
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 70px minmax(-webkit-min-content, 1fr) 40px;
-  -ms-grid-rows: 70px minmax(min-content, 1fr) 40px;
-      grid-template: "header" 70px
-                 "main" minmax(-webkit-min-content, 1fr)
-                 "footer" 40px;
-      grid-template: "header" 70px
+  grid-template: "header" 70px
                  "main" minmax(min-content, 1fr)
                  "footer" 40px;
   margin: 0;
@@ -20,8 +14,6 @@ body {
 }
 
 header {
-  -ms-grid-row: 1;
-  -ms-grid-column: 1;
   grid-area: header;
   background-color: darkblue;
   background: linear-gradient(deepskyblue, lightpink, darkorange);
@@ -29,16 +21,12 @@ header {
 }
 
 main {
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
   grid-area: main;
   background-color: snow;
   padding: 12px;
 }
 
 footer {
-  -ms-grid-row: 3;
-  -ms-grid-column: 1;
   grid-area: footer;
   background: linear-gradient(saddlebrown, black);
   padding: 12px;
@@ -83,13 +71,10 @@ p > a {
 }
 
 .messages-container {
-  display: -ms-grid;
   display: grid;
   max-width: 80ch;
   grid-gap: 10px;
-  -ms-grid-rows: auto 10px auto 10px auto;
-  -ms-grid-columns: minmax(0, 1fr);
-      grid-template: "message0"
+  grid-template: "message0"
                  "message1"
                  "message2" / minmax(0, 1fr);
 }
@@ -99,20 +84,14 @@ p > a {
 }
 
 .message-0 {
-  -ms-grid-row: 1;
-  -ms-grid-column: 1;
   grid-area: message0;
 }
 
 .message-1 {
-  -ms-grid-row: 3;
-  -ms-grid-column: 1;
   grid-area: message1;
 }
 
 .message-2 {
-  -ms-grid-row: 5;
-  -ms-grid-column: 1;
   grid-area: message2;
 }
 
@@ -125,7 +104,6 @@ textarea.messages {
   box-sizing: border-box;
   font-size: inherit;
   font-family: inherit;
-  rows: 250;
 }
 
 button.messages {

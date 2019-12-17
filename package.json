@@ -1,0 +1,11 @@
+{
+  "name": "website",
+  "repository": "git@github.com:skarger/website.git",
+  "author": "Stephen Karger",
+  "private": true,
+  "browserslist": [ ">1%"],
+  "devDependencies": {
+    "autoprefixer": "^9.7.3",
+    "postcss-cli": "^6.1.3"
+  }
+}
