@@ -5,7 +5,9 @@ html {
 body {
   height: 100%;
   display: grid;
-  grid-template-rows: 70px minmax(min-content, 1fr) 40px;
+  grid-template: "header" 70px
+                 "body" minmax(min-content, 1fr)
+                 "footer" 40px;
   margin: 0;
   font-family: 'Helvetica';
   color: #001a00;
@@ -68,8 +70,11 @@ p > a {
 .messages-container {
   display: grid;
   max-width: 80ch;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: 4fr;
+  grid-template: "message0"
+                 "message1"
+                 "control1"
+                 "message2"
+                 "control2" / minmax(0, 1fr);
 }
 
 p {
