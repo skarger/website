@@ -64,3 +64,30 @@ a.nav.current {
 p > a {
   font-weight: bold;
 }
+
+.messages-container {
+  display: grid;
+  max-width: 80ch;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 4fr;
+}
+
+p {
+  max-width: 80ch;
+  overflow-wrap: break-word;
+}
+textarea {
+  max-width: 80ch;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+button.messages {
+  width: 140px;
+  height: 30px;
+}
+
+.message-controls {
+  display: flex;
+  justify-content: flex-end;
+}

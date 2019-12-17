@@ -1,43 +1,74 @@
 {{#*inline "content"}}
-    <p>
-        {{message0}}
-    </p>
+    <div class="messages-container">
+        <p class="messages">
+            {{message0}}
+        </p>
 
-    <textarea id="input1">{{message1}}</textarea>
-    <button id="button1">Save</button>
+        <textarea id="input1" class="messages">{{message1}}</textarea>
+        <div class="message-controls">
+            <button id="button1" class="messages">Save</button>
+        </div>
 
-    <textarea id="input2">{{message2}}</textarea>
-    <button id="button2">Save</button>
+        <textarea id="input2" class="messages">{{message2}}</textarea>
+        <div class="message-controls">
+            <button id="button2" class="messages">Save</button>
+        </div>
+    </div>
 
     <script>
         var input1 = document.getElementById("input1");
         var input2 = document.getElementById("input2");
         var button1 = document.getElementById("button1");
         var button2 = document.getElementById("button2");
+        var saveText = "Save";
+        var savingText = "...";
+        var savedText = "Saved!";
+        var savedTextTimeout = 2000;
+        var editText = "Edit";
+        var saveErrorText = "Error, please retry";
 
         function handleMessage(event) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", '/messages/fromxhr', true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-
-            xhr.onreadystatechange = function() {
-                if (this.readyState === XMLHttpRequest.DONE && this.status === 201) {
-                } else {
-                    console.log("error: " + this.status);
-                }
-            }
-
+            let button;
+            let input;
+            let messageIndex;
             let payload;
             if (event.target.id === button1.id) {
-                payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: 1, body: input1.value };
+                button = button1;
+                input = input1;
+                messageIndex = 1;
             }
 
             if (event.target.id === button2.id) {
-                payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: 2, body: input2.value };
+                button = button2;
+                input = input2;
+                messageIndex = 2;
             }
 
-            if (payload) {
+            if (button.innerHTML === editText) {
+                input.disabled = false;
+                button.innerHTML = saveText;
+            } else if (button.innerHTML === saveText || button.innerHTML === saveErrorText) {
+                payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: messageIndex, body: input.value };
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/messages/{{messageGroup}}", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === XMLHttpRequest.DONE) {
+                        if (this.status === 201) {
+                            input.disabled = true;
+                            button.innerHTML = savedText;
+                            window.setTimeout(function() {
+                                button.innerHTML = editText;
+                            }, savedTextTimeout);
+                        } else {
+                            button.innerHTML = saveErrorText;
+                        }
+                    }
+                }
+
                 xhr.send(JSON.stringify(payload));
+                button.innerHTML = savingText;
             }
         }
 
