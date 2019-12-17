@@ -3,48 +3,6 @@
         {{message_0}}
     </p>
 
-    <link href="/quill/quill.snow.css" rel="stylesheet">
-    <script src="/quill/quill.min.js"></script>
-
-    <style>
-        #editor_1, #editor_2 {
-            height: 350px;
-        }
-    </style>
-
-    <div class="standalone-container">
-        <div id="editor_1"></div>
-    </div>
-    <button id="button_1">Save 1</button>
-
-    <div class="standalone-container">
-        <div id="editor_2"></div>
-    </div>
-    <button id="button_2">Save 2</button>
-
-    <script>
-        var toolbarOptions = [
-              ['bold', 'italic', 'underline'],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-              ['clean']                                         // remove formatting button
-        ];
-
-        var editor_1 = new Quill('#editor_1', {
-            modules: {
-                toolbar: toolbarOptions
-            },
-            theme: 'snow'
-        });
-
-        var editor_2 = new Quill('#editor_2', {
-            modules: {
-                toolbar: toolbarOptions
-            },
-            theme: 'snow'
-        });
-    </script>
-
     <script>
         var input_1 = document.getElementById("input_1");
         var input_2 = document.getElementById("input_2");
@@ -58,7 +16,6 @@
 
             xhr.onreadystatechange = function() {
                 if (this.readyState === XMLHttpRequest.DONE && this.status === 201) {
-
                 } else {
                     console.log("error: " + this.status);
                 }
@@ -66,11 +23,11 @@
 
             let payload;
             if (event.target.id === button_1.id) {
-                payload = { index: 1, body: editor_1.getContents() };
+                payload = { index: 1, body: input_1.value };
             }
 
             if (event.target.id === button_2.id) {
-                payload = { index: 2, body: editor_2.getContents() };
+                payload = { index: 2, body: input_2.value) };
             }
 
             if (payload) {

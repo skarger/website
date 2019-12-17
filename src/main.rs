@@ -121,16 +121,6 @@ fn css() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/style.css")?)
 }
 
-#[get("/quill/quill.min.js")]
-fn quill_js() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/quill/quill.min.js")?)
-}
-
-#[get("/quill/quill.snow.css")]
-fn quill_css() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/quill/quill.snow.css")?)
-}
-
 #[get("/images/charles-river-compressed.png")]
 fn charles() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/images/charles-river-compressed.png")?)
@@ -263,8 +253,6 @@ fn main() -> io::Result<()> {
             .service(favicon_ico)
             .service(fs::Files::new("/static", "static").show_files_listing())
             .service(css)
-            .service(quill_js)
-            .service(quill_css)
             .service(charles)
             // register simple route, handle all methods
             .service(home)
