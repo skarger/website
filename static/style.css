@@ -5,7 +5,7 @@ html {
 body {
   height: 100%;
   display: grid;
-  grid-template-rows: 70px 1fr 40px;
+  grid-template-rows: 70px minmax(min-content, 1fr) 40px;
   margin: 0;
   font-family: 'Helvetica';
   color: #001a00;
