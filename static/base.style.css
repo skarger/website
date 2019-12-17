@@ -1,12 +1,14 @@
 html {
   height: 100%;
+  width: 100%;
 }
 
 body {
   height: 100%;
+  width: 100%;
   display: grid;
   grid-template: "header" 70px
-                 "main" minmax(min-content, 1fr)
+                 "main" 1fr
                  "footer" 40px;
   margin: 0;
   font-family: 'Helvetica';

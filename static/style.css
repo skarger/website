@@ -6,13 +6,9 @@ body {
   height: 100%;
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 70px minmax(-webkit-min-content, 1fr) 40px;
-  -ms-grid-rows: 70px minmax(min-content, 1fr) 40px;
+  -ms-grid-rows: 70px 1fr 40px;
       grid-template: "header" 70px
-                 "main" minmax(-webkit-min-content, 1fr)
-                 "footer" 40px;
-      grid-template: "header" 70px
-                 "main" minmax(min-content, 1fr)
+                 "main" 1fr
                  "footer" 40px;
   margin: 0;
   font-family: 'Helvetica';
@@ -125,7 +121,6 @@ textarea.messages {
   box-sizing: border-box;
   font-size: inherit;
   font-family: inherit;
-  rows: 250;
 }
 
 button.messages {
