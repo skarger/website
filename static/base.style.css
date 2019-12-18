@@ -90,7 +90,8 @@ p > a {
   grid-gap: 10px;
   grid-template: "message0"
                  "message1"
-                 "message2" / minmax(0, 1fr);
+                 "message2"
+                 "message3" / minmax(0, 1fr);
 }
 
 .message-item {
@@ -107,6 +108,10 @@ p > a {
 
 .message-2 {
   grid-area: message2;
+}
+
+.message-3 {
+  grid-area: message3;
 }
 
 p {

@@ -105,11 +105,12 @@ p > a {
   display: grid;
   max-width: 80ch;
   grid-gap: 10px;
-  -ms-grid-rows: auto 10px auto 10px auto;
+  -ms-grid-rows: auto 10px auto 10px auto 10px auto;
   -ms-grid-columns: minmax(0, 1fr);
       grid-template: "message0"
                  "message1"
-                 "message2" / minmax(0, 1fr);
+                 "message2"
+                 "message3" / minmax(0, 1fr);
 }
 
 .message-item {
@@ -132,6 +133,12 @@ p > a {
   -ms-grid-row: 5;
   -ms-grid-column: 1;
   grid-area: message2;
+}
+
+.message-3 {
+  -ms-grid-row: 7;
+  -ms-grid-column: 1;
+  grid-area: message3;
 }
 
 p {
