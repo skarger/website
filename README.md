@@ -1,5 +1,4 @@
-Personal Website
-===
+Personal Website ===
 
 ## Development
 
@@ -14,7 +13,12 @@ Personal Website
 By default the web server will run on port `8080`.
 The `PORT` environment variable can override that.
 
-To run in watch mode, restarting the server on code changes:
+To run in watch mode, restarting the server on code changes, first install helpers:
+```
+cargo install systemfd cargo-watch
+```
+
+Then run this command:
 ```
 systemfd --no-pid -- cargo watch -x run
 ```
