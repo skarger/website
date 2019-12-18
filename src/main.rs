@@ -215,30 +215,38 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
             message_group: &message_group.clone(),
             body: &load_message_body(&connection, &message_group, 2),
             index: &2,
+            message_author: &message_author_0.clone(),
+        };
+
+        let new_message_3 = NewMessage {
+            message_group: &message_group.clone(),
+            body: &load_message_body(&connection, &message_group, 3),
+            index: &3,
             message_author: &message_author_1.clone(),
         };
 
         let button_text_1 = button_text(new_message_1.body);
         let input_disabled_1 = input_disabled(new_message_1.body);
-        let button_text_2 = button_text(new_message_2.body);
-        let input_disabled_2 = input_disabled(new_message_2.body);
+        let button_text_3 = button_text(new_message_3.body);
+        let input_disabled_3 = input_disabled(new_message_3.body);
         let guidance_1 = guidance(new_message_1.body);
-        let guidance_2 = guidance(new_message_2.body);
+        let guidance_3 = guidance(new_message_3.body);
 
         let context = json!({
             "currentPage": "messages",
             "title": "Messages",
             "author0": "a0",
             "author1": "a1",
-            "message0": new_message_0.body,
+            "message0": paragraphs(new_message_0.body),
             "message1": new_message_1.body,
             "inputDisabled1": input_disabled_1,
             "buttonText1": button_text_1,
             "guidance1": guidance_1,
-            "inputDisabled2": input_disabled_2,
-            "buttonText2": button_text_2,
-            "guidance2": guidance_2,
-            "message2": new_message_2.body,
+            "message2": paragraphs(new_message_2.body),
+            "inputDisabled3": input_disabled_3,
+            "buttonText3": button_text_3,
+            "guidance3": guidance_3,
+            "message3": new_message_3.body,
             "messageGroup": message_group,
         });
 
@@ -246,6 +254,10 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
             .content_type("text/html; charset=utf-8")
             .body(data.template_registry.render("messages", &context).unwrap()))
     }
+}
+
+fn paragraphs(body: &str) -> String {
+   body.split("\n").map(|paragraph| format!("<p>{}</p>", paragraph)).collect::<Vec<String>>().join("")
 }
 
 fn button_text(body: &str) -> &str {
