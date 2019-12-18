@@ -3,10 +3,10 @@ html {
 }
 
 body {
-  height: 100%;
-  min-height: 100%;
-  display: -webkit-flex;
-  -webkit-flex-direction: column;
+  height: 100%; /* for IE 11 */
+  min-height: 100%; /* for older mobile safari */
+  display: -webkit-flex; /* for older mobile safari */
+  -webkit-flex-direction: column; /* for older mobile safari */
   display: -ms-grid;
   display: grid;
   -ms-grid-rows: 70px minmax(-webkit-min-content, 1fr) 40px;
@@ -26,7 +26,7 @@ body {
 header {
   -ms-grid-row: 1;
   -ms-grid-column: 1;
-  -webkit-flex-shrink: 0;
+  -webkit-flex-shrink: 0; /* for older mobile safari */
   grid-area: header;
   background-color: darkblue;
   background: linear-gradient(deepskyblue, lightpink, darkorange);
@@ -36,9 +36,9 @@ header {
 main {
   -ms-grid-row: 2;
   -ms-grid-column: 1;
-  -webkit-flex-grow: 1;
-  grid-area: main;
   display: block; /* for IE11 */
+  -webkit-flex-grow: 1; /* for older mobile safari */
+  grid-area: main;
   background-color: snow;
   padding: 12px;
 }
@@ -46,7 +46,7 @@ main {
 footer {
   -ms-grid-row: 3;
   -ms-grid-column: 1;
-  -webkit-flex-shrink: 0;
+  -webkit-flex-shrink: 0; /* for older mobile safari */
   grid-area: footer;
   background: linear-gradient(saddlebrown, black);
   padding: 12px;
@@ -106,7 +106,7 @@ p > a {
 }
 
 .message-item {
-
+  width: 100%;
 }
 
 .message-0 {

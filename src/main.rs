@@ -218,6 +218,11 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
             message_author: &message_author_1.clone(),
         };
 
+        let button_text_1 = button_text(new_message_1.body);
+        let input_disabled_1 = input_disabled(new_message_1.body);
+        let button_text_2 = button_text(new_message_2.body);
+        let input_disabled_2 = input_disabled(new_message_2.body);
+
         let context = json!({
             "currentPage": "messages",
             "title": "Messages",
@@ -225,6 +230,10 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
             "author1": "a1",
             "message0": new_message_0.body,
             "message1": new_message_1.body,
+            "inputDisabled1": input_disabled_1,
+            "buttonText1": button_text_1,
+            "inputDisabled2": input_disabled_2,
+            "buttonText2": button_text_2,
             "message2": new_message_2.body,
             "messageGroup": message_group,
         });
@@ -232,6 +241,22 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
         Ok(HttpResponse::build(StatusCode::OK)
             .content_type("text/html; charset=utf-8")
             .body(data.template_registry.render("messages", &context).unwrap()))
+    }
+}
+
+fn button_text(body: &str) -> &str {
+    if body.len() > 0 {
+        "Edit"
+    } else {
+        "Save"
+    }
+}
+
+fn input_disabled(body: &str) -> &str {
+    if body.len() > 0 {
+        "disabled"
+    } else {
+        ""
     }
 }
 
