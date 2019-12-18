@@ -10,7 +10,8 @@
             <textarea rows=24 id="input1" class="messages" {{inputDisabled1}}>{{message1}}</textarea>
 
             <div class="message-controls">
-                <button id="button1" class="messages">{{buttonText1}}</button>
+                <div id="guidance1" class="control-guidance">{{guidance1}}</div>
+                <div><button id="button1" class="messages">{{buttonText1}}</button></div>
             </div>
         </div>
 
@@ -18,7 +19,8 @@
         <div class="message-item message-2">
             <textarea rows=24 id="input2" class="messages" {{inputDisabled2}}>{{message2}}</textarea>
             <div class="message-controls">
-                <button id="button2" class="messages">{{buttonText2}}</button>
+                <div id="guidance2" class="control-guidance">{{guidance2}}</div>
+                <div><button id="button2" class="messages">{{buttonText2}}</button></div>
             </div>
         </div>
     </div>
@@ -26,27 +28,33 @@
     <script>
         var input1 = document.getElementById("input1");
         var input2 = document.getElementById("input2");
+        var guidance1 = document.getElementById("guidance1");
+        var guidance2 = document.getElementById("guidance2");
         var button1 = document.getElementById("button1");
         var button2 = document.getElementById("button2");
         var saveText = "Save";
         var savingText = "...";
-        var savedText = "Saved!";
-        var savedTextTimeout = 2000;
         var editText = "Edit";
-        var saveErrorText = "Error, please retry";
+        var saveErrorText = "Retry";
+        var savedGuidance = "Saved.";
+        var editingGuidance = "";
+        var errorGuidance = "Save failed. Please try again or report the problem.";
 
         function handleMessage(event) {
             let button;
             let input;
+            let guidance;
             let messageIndex;
             let payload;
             if (event.target.id === button1.id) {
+                guidance = guidance1;
                 button = button1;
                 input = input1;
                 messageIndex = 1;
             }
 
             if (event.target.id === button2.id) {
+                guidance = guidance2;
                 button = button2;
                 input = input2;
                 messageIndex = 2;
@@ -55,6 +63,7 @@
             if (button.innerHTML === editText) {
                 input.disabled = false;
                 button.innerHTML = saveText;
+                guidance.innerHTML = editingGuidance;
             } else if (button.innerHTML === saveText || button.innerHTML === saveErrorText) {
                 payload = { message_group: "{{messageGroup}}", author: "{{author1}}", index: messageIndex, body: input.value };
                 var xhr = new XMLHttpRequest();
@@ -65,12 +74,11 @@
                     if (this.readyState === XMLHttpRequest.DONE) {
                         if (this.status === 201) {
                             input.disabled = true;
-                            button.innerHTML = savedText;
-                            window.setTimeout(function() {
-                                button.innerHTML = editText;
-                            }, savedTextTimeout);
+                            button.innerHTML = editText;
+                            guidance.innerHTML = savedGuidance;
                         } else {
                             button.innerHTML = saveErrorText;
+                            guidance.innerHTML = errorGuidance;
                         }
                     }
                 }

@@ -222,6 +222,8 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
         let input_disabled_1 = input_disabled(new_message_1.body);
         let button_text_2 = button_text(new_message_2.body);
         let input_disabled_2 = input_disabled(new_message_2.body);
+        let guidance_1 = guidance(new_message_1.body);
+        let guidance_2 = guidance(new_message_2.body);
 
         let context = json!({
             "currentPage": "messages",
@@ -232,8 +234,10 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
             "message1": new_message_1.body,
             "inputDisabled1": input_disabled_1,
             "buttonText1": button_text_1,
+            "guidance1": guidance_1,
             "inputDisabled2": input_disabled_2,
             "buttonText2": button_text_2,
+            "guidance2": guidance_2,
             "message2": new_message_2.body,
             "messageGroup": message_group,
         });
@@ -257,6 +261,14 @@ fn input_disabled(body: &str) -> &str {
         "disabled"
     } else {
         ""
+    }
+}
+
+fn guidance(body: &str) -> &str {
+    if body.len() > 0 {
+        ""
+    } else {
+        "You will be able to edit after saving."
     }
 }
 

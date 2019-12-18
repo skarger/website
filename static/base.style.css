@@ -19,7 +19,6 @@ body {
 header {
   -webkit-flex-shrink: 0; /* for older mobile safari */
   grid-area: header;
-  background-color: darkblue;
   background: linear-gradient(deepskyblue, lightpink, darkorange);
   padding: 8px;
 }
@@ -40,7 +39,7 @@ footer {
 }
 
 nav {
-  max-width: 120px;
+  max-width: 140px;
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -53,16 +52,24 @@ a {
 }
 
 a.nav {
-  padding: 4px;
+  padding: 6px;
   border-radius: 10px;
   border: 1px solid dimgrey;
   color: lightyellow;
+  font-weight: bold;
   background-color: dimgrey;
 }
 
 a.nav.current {
   color: dimgrey;
   background-color: lightyellow;
+}
+
+button {
+  border: 1px solid dimgrey;
+  background-color: lightyellow;
+  color: darkslategray;
+  font-size: medium;
 }
 
 .home-content {
@@ -121,4 +128,9 @@ button.messages {
 .message-controls {
   display: flex;
   justify-content: flex-end;
+  align-items: baseline;
+}
+
+.control-guidance {
+  padding-right: 6px;
 }
