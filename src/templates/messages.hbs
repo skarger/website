@@ -16,22 +16,22 @@
         </div>
 
 
-        <div class="message-item message-2">
-            <textarea rows=24 id="input2" class="messages" {{inputDisabled2}}>{{message2}}</textarea>
+        <div class="message-item message-3">
+            <textarea rows=24 id="input3" class="messages" {{inputDisabled3}}>{{message3}}</textarea>
             <div class="message-controls">
-                <div id="guidance2" class="control-guidance">{{guidance2}}</div>
-                <div><button id="button2" class="messages">{{buttonText2}}</button></div>
+                <div id="guidance3" class="control-guidance">{{guidance3}}</div>
+                <div><button id="button3" class="messages">{{buttonText3}}</button></div>
             </div>
         </div>
     </div>
 
     <script>
         var input1 = document.getElementById("input1");
-        var input2 = document.getElementById("input2");
+        var input3 = document.getElementById("input3");
         var guidance1 = document.getElementById("guidance1");
-        var guidance2 = document.getElementById("guidance2");
+        var guidance3 = document.getElementById("guidance3");
         var button1 = document.getElementById("button1");
-        var button2 = document.getElementById("button2");
+        var button3 = document.getElementById("button3");
         var saveText = "Save";
         var savingText = "...";
         var editText = "Edit";
@@ -53,11 +53,11 @@
                 messageIndex = 1;
             }
 
-            if (event.target.id === button2.id) {
-                guidance = guidance2;
-                button = button2;
-                input = input2;
-                messageIndex = 2;
+            if (event.target.id === button3.id) {
+                guidance = guidance3;
+                button = button3;
+                input = input3;
+                messageIndex = 3;
             }
 
             if (button.innerHTML === editText) {
@@ -89,7 +89,7 @@
         }
 
         button1.addEventListener("click", handleMessage);
-        button2.addEventListener("click", handleMessage);
+        button3.addEventListener("click", handleMessage);
     </script>
 {{/inline}}
 {{~> application~}}
