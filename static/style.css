@@ -157,6 +157,7 @@ button.messages {
           justify-content: flex-end;
   -webkit-align-items: baseline;
           align-items: baseline;
+  padding-top: 8px;
 }
 
 .control-guidance {

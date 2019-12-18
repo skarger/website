@@ -129,6 +129,7 @@ button.messages {
   display: flex;
   justify-content: flex-end;
   align-items: baseline;
+  padding-top: 8px;
 }
 
 .control-guidance {
