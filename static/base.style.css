@@ -123,11 +123,13 @@ textarea.messages {
   box-sizing: border-box;
   font-size: inherit;
   font-family: inherit;
+  padding: 4px;
 }
 
 button.messages {
   width: 140px;
   height: 30px;
+  border-radius: 10px;
 }
 
 .message-controls {
