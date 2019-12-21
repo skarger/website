@@ -2,13 +2,15 @@
 extern crate actix_web;
 #[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate log;
 
 use actix_files as fs;
 use actix_web::http::{StatusCode};
 use actix_web::{
     guard, middleware, web, App, HttpResponse, HttpServer, Result,
 };
-use diesel::pg::PgConnection;
+
 use dotenv::dotenv;
 use handlebars::Handlebars;
 use listenfd::ListenFd;
@@ -16,20 +18,19 @@ use serde_json::json;
 use serde::Deserialize;
 use std::{env, io};
 use actix_web_middleware_redirect_https::RedirectHTTPS;
-use diesel::Connection;
 
 pub mod schema;
 pub mod models;
+pub mod db;
 
-use self::models::{Message,NewMessage};
-use self::diesel::prelude::*;
+use self::db::{establish_connection, message_bodies_for_group, create_message};
 
 struct AppState {
     pub template_registry: Handlebars<'static>,
 }
 
 #[derive(Deserialize)]
-struct MessagePayload {
+pub struct MessagePayload {
     pub message_group: String,
     pub index: i32,
     pub body: String,
@@ -52,40 +53,6 @@ fn register_templates() -> Result<Handlebars<'static>> {
     }
 
     Ok(template_registry)
-}
-
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
-
-fn load_message_body(connection: &PgConnection, _message_group: &String, message_index: i32) -> String {
-    let messages: Vec<Message>  = latest_messages(connection, message_index);
-
-    let mut body = String::new();
-    if messages.len() > 0 {
-        match &messages[0].body {
-            Some(val) => body = val.to_owned(),
-            None => {}
-        }
-    }
-    body
-}
-
-fn latest_messages(connection: &PgConnection, message_index: i32) -> Vec<Message> {
-    use self::schema::messages::dsl::*;
-
-    let latest_messages = messages.filter(index.eq(message_index))
-        .order(created_at.desc())
-        .limit(1)
-        .load::<Message>(connection)
-        .expect("Error loading messages");
-
-    latest_messages
 }
 
 fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
@@ -112,22 +79,6 @@ fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, m
             .content_type("application/json; charset=utf-8")
             .json(context))
     }
-}
-
-fn create_message(connection: &PgConnection, message_payload: &MessagePayload) -> Message {
-    use self::schema::messages;
-
-    let new_message = NewMessage {
-        message_group: &message_payload.message_group,
-        body: &message_payload.body,
-        index: &message_payload.index,
-        message_author: &message_payload.author,
-    };
-
-    diesel::insert_into(messages::table)
-        .values(&new_message)
-        .get_result(connection)
-        .expect("Error saving new message")
 }
 
 fn serve_favicon() -> Result<fs::NamedFile> {
@@ -192,61 +143,30 @@ fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Res
         p404(data)
     } else {
         let connection = establish_connection();
-        let message_author_0 = env::var("MESSAGE_AUTHOR_0_ID")
-            .unwrap_or_else(|_| "".to_string());
-        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
-            .unwrap_or_else(|_| "".to_string());
+        let new_messages = message_bodies_for_group(&connection, &message_group);
 
-        let new_message_0 = NewMessage {
-            message_group: &message_group.clone(),
-            body: &load_message_body(&connection, &message_group, 0),
-            index: &0,
-            message_author: &message_author_0.clone(),
-        };
-
-        let new_message_1 = NewMessage {
-            message_group: &message_group.clone(),
-            body: &load_message_body(&connection, &message_group, 1),
-            index: &1,
-            message_author: &message_author_1.clone(),
-        };
-
-        let new_message_2 = NewMessage {
-            message_group: &message_group.clone(),
-            body: &load_message_body(&connection, &message_group, 2),
-            index: &2,
-            message_author: &message_author_0.clone(),
-        };
-
-        let new_message_3 = NewMessage {
-            message_group: &message_group.clone(),
-            body: &load_message_body(&connection, &message_group, 3),
-            index: &3,
-            message_author: &message_author_1.clone(),
-        };
-
-        let button_text_1 = button_text(new_message_1.body);
-        let input_disabled_1 = input_disabled(new_message_1.body);
-        let button_text_3 = button_text(new_message_3.body);
-        let input_disabled_3 = input_disabled(new_message_3.body);
-        let guidance_1 = guidance(new_message_1.body);
-        let guidance_3 = guidance(new_message_3.body);
+        let button_text_1 = button_text(&new_messages[1]);
+        let input_disabled_1 = input_disabled(&new_messages[1]);
+        let button_text_3 = button_text(&new_messages[3]);
+        let input_disabled_3 = input_disabled(&new_messages[3]);
+        let guidance_1 = guidance(&new_messages[1]);
+        let guidance_3 = guidance(&new_messages[3]);
 
         let context = json!({
             "currentPage": "messages",
             "title": "Messages",
             "author0": "a0",
             "author1": "a1",
-            "message0": paragraphs(new_message_0.body),
-            "message1": new_message_1.body,
+            "message0": paragraphs(&new_messages[0]),
+            "message1": &new_messages[1],
             "inputDisabled1": input_disabled_1,
             "buttonText1": button_text_1,
             "guidance1": guidance_1,
-            "message2": paragraphs(new_message_2.body),
+            "message2": paragraphs(&new_messages[2]),
             "inputDisabled3": input_disabled_3,
             "buttonText3": button_text_3,
             "guidance3": guidance_3,
-            "message3": new_message_3.body,
+            "message3": &new_messages[3],
             "messageGroup": message_group,
         });
 
@@ -291,7 +211,7 @@ fn authorized(message_group: &str) -> bool {
 
 fn main() -> io::Result<()> {
     dotenv().ok();
-    env::set_var("RUST_LOG", "actix_web=debug");
+    std::env::set_var("RUST_LOG", "actix_web=info,web=info");
     env_logger::init();
 
     let mut listenfd = ListenFd::from_env();
