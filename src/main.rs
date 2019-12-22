@@ -207,6 +207,8 @@ fn main() -> io::Result<()> {
                 template_registry: register_templates().unwrap(),
             })
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
+            .wrap(middleware::Compress::default())
+            .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             .service(fs::Files::new("/static", "static").show_files_listing())
