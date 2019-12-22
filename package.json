@@ -8,7 +8,7 @@
     "yarn": "1.x"
   },
   "scripts": {
-    "build": "yarn postcss --verbose static/base.style.css -o static/style.css"
+    "build": "yarn postcss --verbose static/style.css -o static/dist/style.css"
   },
   "browserslist": [
     ">1%",

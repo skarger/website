@@ -24,7 +24,7 @@ systemfd --no-pid -- cargo watch -x run
 ```
 
 To build CSS:
-`yarn postcss --verbose static/base.style.css -o static/style.css`
+`yarn build`
 
 ## Deployment
 
