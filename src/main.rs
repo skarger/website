@@ -79,30 +79,6 @@ fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, m
     }
 }
 
-fn serve_favicon() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/favicon.ico")?)
-}
-
-#[get("/favicon")]
-fn favicon() -> Result<fs::NamedFile> {
-    serve_favicon()
-}
-
-#[get("/favicon.ico")]
-fn favicon_ico() -> Result<fs::NamedFile> {
-    serve_favicon()
-}
-
-#[get("/style.css")]
-fn css() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/style.css")?)
-}
-
-#[get("/images/charles-river-compressed.png")]
-fn charles() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/images/charles-river-compressed.png")?)
-}
-
 fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
     let context = json!({
         "currentPage": "404",
@@ -233,12 +209,7 @@ fn main() -> io::Result<()> {
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
-            // register favicon
-            .service(favicon)
-            .service(favicon_ico)
             .service(fs::Files::new("/static", "static").show_files_listing())
-            .service(css)
-            .service(charles)
             // register simple route, handle all methods
             .service(home)
             .service(about)
