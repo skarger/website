@@ -2,8 +2,6 @@
 extern crate actix_web;
 #[macro_use]
 extern crate diesel;
-#[macro_use]
-extern crate log;
 
 use actix_files as fs;
 use actix_web::http::{StatusCode};
