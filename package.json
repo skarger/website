@@ -3,7 +3,17 @@
   "repository": "git@github.com:skarger/website.git",
   "author": "Stephen Karger",
   "private": true,
-  "browserslist": [ ">1%", "iOS >= 8"],
+  "engines": {
+    "node": "12.x",
+    "yarn": "1.x"
+  },
+  "scripts": {
+    "build": "yarn postcss --verbose static/style.css -o static/dist/style.css"
+  },
+  "browserslist": [
+    ">1%",
+    "iOS >= 8"
+  ],
   "devDependencies": {
     "autoprefixer": "^9.7.3",
     "postcss-cli": "^6.1.3"

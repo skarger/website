@@ -23,6 +23,9 @@ Then run this command:
 systemfd --no-pid -- cargo watch -x run
 ```
 
+To build CSS:
+`yarn build`
+
 ## Deployment
 
 The backend server is hosted on [Heroku](https://www.heroku.com/).
