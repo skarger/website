@@ -89,6 +89,11 @@ fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
         .body(data.template_registry.render("404", &context).unwrap()))
 }
 
+#[get("/favicon.ico")]
+fn favicon() -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("static/favicon.ico")?)
+}
+
 #[get("/")]
 fn home(data: web::Data<AppState>) -> Result<HttpResponse> {
     let context = json!({
@@ -215,6 +220,7 @@ fn main() -> io::Result<()> {
             // register simple route, handle all methods
             .service(home)
             .service(about)
+            .service(favicon)
             .route("/messages/{message_group}", web::get().to(load_message_group))
             .route("/messages/{message_group}", web::post().to(create_message_in_group))
             .default_service(
