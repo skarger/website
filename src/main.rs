@@ -46,8 +46,11 @@ fn register_templates() -> Result<Handlebars<'static>> {
             .and_then(|_| { template_registry.register_template_file("404", "./src/templates/404.hbs") })
             .and_then(|_| { template_registry.register_template_file("messages", "./src/templates/messages.hbs") })
             .and_then(|_| { template_registry.register_template_file("about", "./src/templates/about.hbs") });
-    if res.is_err() {
-        panic!("Could not register template")
+    match res {
+        Ok(_) => { },
+        Err(tfe) => {
+            panic!("Could not register template: {}", tfe)
+        }
     }
 
     Ok(template_registry)
