@@ -20,11 +20,13 @@ use actix_web_middleware_redirect_https::RedirectHTTPS;
 pub mod schema;
 pub mod models;
 pub mod db;
+pub mod templates { pub mod registry; }
 
 use self::db::{establish_connection, message_bodies_for_group, create_message};
+use self::templates::registry as template_registry;
 
-struct AppState {
-    pub template_registry: Handlebars<'static>,
+struct AppState<'a> {
+    pub template_registry: Handlebars<'a>,
 }
 
 #[derive(Deserialize)]
@@ -35,26 +37,7 @@ pub struct MessagePayload {
     pub author: String,
 }
 
-// Registers the Handlebars templates for the application.
-fn register_templates() -> Result<Handlebars<'static>> {
-    let mut template_registry = Handlebars::new();
-    template_registry.set_strict_mode(true);
-    let res =
-        template_registry.register_template_file("application", "./src/templates/partials/application.hbs")
-            .and_then(|_| { template_registry.register_template_file("header", "./src/templates/partials/header.hbs") })
-            .and_then(|_| { template_registry.register_template_file("home", "./src/templates/home.hbs") })
-            .and_then(|_| { template_registry.register_template_file("404", "./src/templates/404.hbs") })
-            .and_then(|_| { template_registry.register_template_file("messages", "./src/templates/messages.hbs") })
-            .and_then(|_| { template_registry.register_template_file("about", "./src/templates/about.hbs") });
-    match res {
-        Ok(_) => { },
-        Err(tfe) => {
-            panic!("Could not register template: {}", tfe)
-        }
-    }
 
-    Ok(template_registry)
-}
 
 fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
     let message_group = &format!("{}", path);
@@ -212,7 +195,7 @@ fn main() -> io::Result<()> {
     let mut server = HttpServer::new(move || {
         App::new()
             .data(AppState {
-                template_registry: register_templates().unwrap(),
+                template_registry: template_registry::register_templates(),
             })
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
