@@ -7,7 +7,7 @@ use dotenv::dotenv;
 use listenfd::ListenFd;
 use std::{env, io};
 
-use web_server::{self, AppState};
+use web_server;
 
 fn main() -> io::Result<()> {
     dotenv().ok();
@@ -29,9 +29,7 @@ fn main() -> io::Result<()> {
 
     let mut server = HttpServer::new(move || {
         App::new()
-            .data(AppState {
-                template_registry: web_server::register_templates(),
-            })
+            .data(web_server::request_data())
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))

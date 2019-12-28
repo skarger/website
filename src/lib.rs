@@ -29,6 +29,12 @@ pub struct MessagePayload {
     pub author: String,
 }
 
+pub fn request_data<'a>() -> AppState<'a> {
+    AppState {
+        template_registry: register_templates(),
+    }
+}
+
 pub fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
     let context = json!({
         "currentPage": "404",
