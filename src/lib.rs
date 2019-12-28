@@ -2,9 +2,8 @@
 extern crate diesel;
 
 use actix_files as fs;
-use actix_web::http::{StatusCode};
 use actix_web::{
-    web, HttpResponse, Result,
+    web, http::StatusCode, HttpResponse, Result,
 };
 
 use handlebars::Handlebars;
@@ -47,6 +46,10 @@ pub fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
 
 pub fn favicon() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/favicon.ico")?)
+}
+
+pub fn static_files() -> fs::Files {
+    fs::Files::new("/static", "static").show_files_listing()
 }
 
 pub fn home(data: web::Data<AppState>) -> Result<HttpResponse> {

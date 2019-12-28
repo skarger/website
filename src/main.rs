@@ -1,4 +1,3 @@
-use actix_files as fs;
 use actix_web::{
     guard, middleware, web, App, HttpResponse, HttpServer
 };
@@ -35,7 +34,7 @@ fn main() -> io::Result<()> {
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
-            .service(fs::Files::new("/static", "static").show_files_listing())
+            .service(web_server::static_files())
             .route("/", web::get().to(web_server::home))
             .route("/favicon.ico", web::get().to(web_server::favicon))
             .route("/about", web::get().to(web_server::about))

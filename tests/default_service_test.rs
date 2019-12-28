@@ -1,7 +1,5 @@
 use actix_web::dev::Service;
-use actix_web::{test, web, guard, App, HttpResponse};
-use actix_web::http::{StatusCode};
-
+use actix_web::{test, web, guard, http::StatusCode, App, HttpResponse};
 use web_server;
 
 #[test]
