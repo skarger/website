@@ -1,13 +1,12 @@
 use actix_web::dev::Service;
-use actix_web::{test, web, App};
+use actix_web::{test, App};
 use web_server;
 
 #[test]
 fn about_get() {
     let mut app = test::init_service(
         App::new()
-            .data(web_server::request_data())
-            .route("/about", web::get().to(web_server::about)));
+            .configure(web_server::config));
     let req = test::TestRequest::get().uri("/about").to_request();
     let resp = test::block_on(app.call(req)).unwrap();
 

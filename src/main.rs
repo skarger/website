@@ -1,5 +1,5 @@
 use actix_web::{
-    guard, middleware, web, App, HttpResponse, HttpServer
+    middleware, App, HttpServer
 };
 use actix_web_middleware_redirect_https::RedirectHTTPS;
 use dotenv::dotenv;
@@ -18,39 +18,23 @@ fn main() -> io::Result<()> {
     let app_environment = env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "development".to_string());
 
+    let redirect_to_https = app_environment == "production" || app_environment == "staging";
+
     // Get the port number to listen on.
     let port = env::var("PORT")
         .unwrap_or_else(|_| "8080".to_string())
         .parse()
         .expect("PORT must be a number");
 
-    let redirect_to_https = app_environment == "production" || app_environment == "staging";
-
     let mut server = HttpServer::new(move || {
         App::new()
-            .data(web_server::request_data())
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
-            .service(web_server::static_files())
-            .route("/", web::get().to(web_server::home))
-            .route("/favicon.ico", web::get().to(web_server::favicon))
-            .route("/about", web::get().to(web_server::about))
-            .route("/messages/{message_group}", web::get().to(web_server::load_message_group))
-            .route("/messages/{message_group}", web::post().to(web_server::create_message_in_group))
-            .default_service(
-                // 404 for GET request
-                web::resource("")
-                    .route(web::get().to(web_server::p404))
-                    // all requests that are not `GET`
-                    .route(
-                        web::route()
-                            .guard(guard::Not(guard::Get()))
-                            .to(HttpResponse::MethodNotAllowed),
-                    ),
-            )
+            .configure(web_server::config)
+            .default_service(web_server::default_service())
     });
 
     server = if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {

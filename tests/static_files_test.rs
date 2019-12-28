@@ -6,7 +6,7 @@ use web_server;
 fn static_get() {
     let mut app = test::init_service(
         App::new()
-            .service(web_server::static_files()));
+            .configure(web_server::config));
 
     let req = test::TestRequest::get().uri("/static/404.html").to_request();
     let resp = test::block_on(app.call(req)).unwrap();

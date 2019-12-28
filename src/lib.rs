@@ -3,7 +3,7 @@ extern crate diesel;
 
 use actix_files as fs;
 use actix_web::{
-    web, http::StatusCode, HttpResponse, Result,
+    guard, web, HttpResponse, Result, http::StatusCode, Resource
 };
 
 use handlebars::Handlebars;
@@ -26,6 +26,28 @@ pub struct MessagePayload {
     pub index: i32,
     pub body: String,
     pub author: String,
+}
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.data(request_data())
+        .service(static_files())
+        .route("/", web::get().to(home))
+        .route("/favicon.ico", web::get().to(favicon))
+        .route("/about", web::get().to(about))
+        .route("/messages/{message_group}", web::get().to(load_message_group))
+        .route("/messages/{message_group}", web::post().to(create_message_in_group));
+}
+
+pub fn default_service() -> Resource {
+    // 404 for GET request
+    web::resource("")
+        .route(web::get().to(p404))
+        // all requests that are not `GET`
+        .route(
+            web::route()
+                .guard(guard::Not(guard::Get()))
+                .to(HttpResponse::MethodNotAllowed),
+        )
 }
 
 pub fn request_data<'a>() -> AppState<'a> {

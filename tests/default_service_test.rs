@@ -1,25 +1,14 @@
 use actix_web::dev::Service;
-use actix_web::{test, web, guard, http::StatusCode, App, HttpResponse};
+use actix_web::{test, http::StatusCode, App};
 use web_server;
 
 #[test]
 fn default_service() {
     let mut app = test::init_service(
         App::new()
-            .data(web_server::request_data())
-            .default_service(
-                // 404 for GET request
-                web::resource("")
-                    .route(web::get().to(web_server::p404))
-                    // all requests that are not `GET`
-                    .route(
-                        web::route()
-                            .guard(guard::Not(guard::Get()))
-                            .to(HttpResponse::MethodNotAllowed),
-                    ),
-            )
+            .configure(web_server::config)
+            .default_service(web_server::default_service()));
 
-    );
     let req = test::TestRequest::get().uri("/unknown").to_request();
     let resp = test::block_on(app.call(req)).unwrap();
 
