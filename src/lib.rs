@@ -4,12 +4,21 @@ use actix_web::{
 };
 
 use handlebars::Handlebars;
+use serde::Deserialize;
 use serde_json::json;
 
 pub mod templates { pub mod registry; }
 
 pub struct AppState<'a> {
     pub template_registry: Handlebars<'a>,
+}
+
+#[derive(Deserialize)]
+pub struct MessagePayload {
+    pub message_group: String,
+    pub index: i32,
+    pub body: String,
+    pub author: String,
 }
 
 pub fn home(data: web::Data<AppState>) -> Result<HttpResponse> {

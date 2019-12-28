@@ -12,7 +12,6 @@ use actix_web::{
 use dotenv::dotenv;
 use listenfd::ListenFd;
 use serde_json::json;
-use serde::Deserialize;
 use std::{env, io};
 use actix_web_middleware_redirect_https::RedirectHTTPS;
 
@@ -21,19 +20,7 @@ pub mod models;
 pub mod db;
 
 use self::db::{establish_connection, message_bodies_for_group, create_message};
-use web_server::{AppState, home, register_templates};
-
-
-
-#[derive(Deserialize)]
-pub struct MessagePayload {
-    pub message_group: String,
-    pub index: i32,
-    pub body: String,
-    pub author: String,
-}
-
-
+use web_server::{self, AppState, MessagePayload};
 
 fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
     let message_group = &format!("{}", path);
@@ -180,7 +167,7 @@ fn main() -> io::Result<()> {
     let mut server = HttpServer::new(move || {
         App::new()
             .data(AppState {
-                template_registry: register_templates(),
+                template_registry: web_server::register_templates(),
             })
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
@@ -191,7 +178,7 @@ fn main() -> io::Result<()> {
             // register simple route, handle all methods
             .service(about)
             .service(favicon)
-            .route("/", web::get().to(home))
+            .route("/", web::get().to(web_server::home))
             .route("/messages/{message_group}", web::get().to(load_message_group))
             .route("/messages/{message_group}", web::post().to(create_message_in_group))
             .default_service(
