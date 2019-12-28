@@ -10,7 +10,6 @@ use actix_web::{
 };
 
 use dotenv::dotenv;
-use handlebars::Handlebars;
 use listenfd::ListenFd;
 use serde_json::json;
 use serde::Deserialize;
@@ -20,14 +19,11 @@ use actix_web_middleware_redirect_https::RedirectHTTPS;
 pub mod schema;
 pub mod models;
 pub mod db;
-pub mod templates { pub mod registry; }
 
 use self::db::{establish_connection, message_bodies_for_group, create_message};
-use self::templates::registry as template_registry;
+use web_server::{AppState, home, register_templates};
 
-struct AppState<'a> {
-    pub template_registry: Handlebars<'a>,
-}
+
 
 #[derive(Deserialize)]
 pub struct MessagePayload {
@@ -78,17 +74,6 @@ fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
 #[get("/favicon.ico")]
 fn favicon() -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("static/favicon.ico")?)
-}
-
-#[get("/")]
-fn home(data: web::Data<AppState>) -> Result<HttpResponse> {
-    let context = json!({
-        "currentPage": "home",
-        "title": "Home",
-    });
-    Ok(HttpResponse::build(StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("home", &context).unwrap()))
 }
 
 #[get("/about")]
@@ -195,7 +180,7 @@ fn main() -> io::Result<()> {
     let mut server = HttpServer::new(move || {
         App::new()
             .data(AppState {
-                template_registry: template_registry::register_templates(),
+                template_registry: register_templates(),
             })
             .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
@@ -204,9 +189,9 @@ fn main() -> io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(fs::Files::new("/static", "static").show_files_listing())
             // register simple route, handle all methods
-            .service(home)
             .service(about)
             .service(favicon)
+            .route("/", web::get().to(home))
             .route("/messages/{message_group}", web::get().to(load_message_group))
             .route("/messages/{message_group}", web::post().to(create_message_in_group))
             .default_service(
