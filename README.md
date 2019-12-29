@@ -27,6 +27,19 @@ systemfd --no-pid -- cargo watch -x run
 To build CSS:
 `yarn build`
 
+## Testing
+
+To build the test DB:
+
+```
+createdb website_test
+```
+
+Migrate it:
+```
+DATABASE_URL=postgres://localhost/website_test diesel migration run
+```
+
 ## Deployment
 
 The backend server is hosted on [Heroku](https://www.heroku.com/).
