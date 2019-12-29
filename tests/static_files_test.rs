@@ -10,15 +10,15 @@ fn static_get() {
 
     let req = test::TestRequest::get().uri("/static/404.html").to_request();
     let resp = test::block_on(app.call(req)).unwrap();
-    assert!(resp.status().is_success());
+    assert!(resp.status().is_success(), "Successfully serves static 404 page");
 
     let req = test::TestRequest::get().uri("/static/favicon.ico").to_request();
     let resp = test::block_on(app.call(req)).unwrap();
-    assert!(resp.status().is_success());
+    assert!(resp.status().is_success(), "Successfully serves favicon");
 
     let req = test::TestRequest::get().uri("/static/unknown.jpg").to_request();
     let resp = test::block_on(app.call(req)).unwrap();
-    assert!(resp.status().is_client_error());
-    assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    assert!(resp.status().is_client_error(), "Returns 400-level error for unknown static file");
+    assert_eq!(resp.status(), StatusCode::NOT_FOUND, "Returns 404 for unknown static file");
 }
 
