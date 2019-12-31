@@ -48,13 +48,12 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
             Either::Left(self.service.call(req))
         } else {
             let transformed_url = transform_url(&req);
-//            Either::Right(ok(req.into_response(
-//                HttpResponse::Found()
-//                    .header(header::LOCATION, transformed_url)
-//                    .finish()
-//                    .into_body(),
-//            )))
-            Either::Left(self.service.call(req))
+            Either::Right(ok(req.into_response(
+                HttpResponse::Found()
+                    .header(header::LOCATION, transformed_url)
+                    .finish()
+                    .into_body(),
+            )))
         }
     }
 }
@@ -65,17 +64,14 @@ fn is_https(req: &ServiceRequest) -> bool {
 }
 
 fn transform_url(req: &ServiceRequest) -> String {
-    let uri = req.uri();
     let conn_info = req.connection_info();
-    let scheme = conn_info.scheme();
     let default_host = env::var("URI_AUTHORITY").unwrap_or(String::from(""));
     let host = if conn_info.host().len() > 0 {
         conn_info.host()
     } else {
         default_host.as_str()
     };
-    let path_and_query = uri.path_and_query().map_or("", |v| v.as_str());
-    info!("scheme: {}, host: {}, path_and_query: {}", scheme, host, path_and_query);
+    let path_and_query = req.uri().path_and_query().map_or("", |v| v.as_str());
 
     let url = Uri::builder()
         .scheme("https")
@@ -84,6 +80,5 @@ fn transform_url(req: &ServiceRequest) -> String {
         .build()
         .unwrap();
 
-    info!("tu: {}", url);
     format!("{}", url)
 }

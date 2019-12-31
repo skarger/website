@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use actix_web::{
     middleware, App, HttpServer
 };
@@ -43,5 +46,6 @@ async fn main() -> io::Result<()> {
         server.bind(("0.0.0.0", port))?
     };
 
+    info!("Starting server in {} mode.", app_environment);
     server.run().await
 }
