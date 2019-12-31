@@ -54,6 +54,7 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
             let default_uri_authority = env::var("URI_AUTHORITY").unwrap_or(String::from(""));
             let authority = uri.authority().map_or(default_uri_authority.as_str(), |v| v.as_str());
             let path_and_query = uri.path_and_query().map_or("", |v| v.as_str());
+            println!("uri: {}, authority: {}, path_and_query: {}", uri, authority, path_and_query);
 
             let url = Uri::builder()
                 .scheme("https")
@@ -62,12 +63,13 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
                 .build()
                 .unwrap();
 
-            Either::Right(ok(req.into_response(
-                HttpResponse::Found()
-                    .header(header::LOCATION, format!("{}", url))
-                    .finish()
-                    .into_body(),
-            )))
+//            Either::Right(ok(req.into_response(
+//                HttpResponse::Found()
+//                    .header(header::LOCATION, format!("{}", url))
+//                    .finish()
+//                    .into_body(),
+//            )))
+            Either::Left(self.service.call(req))
         }
     }
 }
