@@ -3,7 +3,8 @@ extern crate diesel;
 
 use actix_files::{NamedFile, Files};
 use actix_web::{
-    web, HttpResponse, Responder, guard, Resource, Result
+    HttpResponse, Responder, Resource, Result,
+    web, guard
 };
 
 use handlebars::Handlebars;

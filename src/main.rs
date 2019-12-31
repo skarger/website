@@ -29,14 +29,12 @@ async fn main() -> io::Result<()> {
 
     let mut server = HttpServer::new(move || {
         App::new()
-//            .data(web_server::request_data())
 //            .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             .configure(web_server::config)
-//            .default_service(web_server::default_service())
             .default_service(web_server::default_service())
     });
 
