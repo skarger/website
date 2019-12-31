@@ -16,6 +16,9 @@ pub mod db;
 pub mod models;
 pub mod schema;
 pub mod templates { pub mod registry; }
+pub mod require_https;
+
+pub use require_https::RequireHttps;
 
 pub struct AppState<'a> {
     pub template_registry: Handlebars<'a>,

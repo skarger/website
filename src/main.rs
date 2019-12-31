@@ -1,7 +1,6 @@
 use actix_web::{
     middleware, App, HttpServer
 };
-//use actix_web_middleware_redirect_https::RedirectHTTPS;
 use dotenv::dotenv;
 use listenfd::ListenFd;
 use std::{env, io};
@@ -16,10 +15,10 @@ async fn main() -> io::Result<()> {
 
     let mut listenfd = ListenFd::from_env();
 
-//    let app_environment = env::var("APP_ENVIRONMENT")
-//        .unwrap_or_else(|_| "development".to_string());
-//
-//    let redirect_to_https = app_environment == "production" || app_environment == "staging";
+    let app_environment = env::var("APP_ENVIRONMENT")
+        .unwrap_or_else(|_| "development".to_string());
+
+    let require_https = app_environment == "production" || app_environment == "staging";
 
     // Get the port number to listen on.
     let port = env::var("PORT")
@@ -29,9 +28,9 @@ async fn main() -> io::Result<()> {
 
     let mut server = HttpServer::new(move || {
         App::new()
-//            .wrap(middleware::Condition::new(redirect_to_https, RedirectHTTPS::default()))
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
+            .wrap(middleware::Condition::new(require_https, web_server::RequireHttps))
             // enable logger - always register actix-web Logger middleware last
             .wrap(middleware::Logger::default())
             .configure(web_server::config)
