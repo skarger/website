@@ -75,7 +75,7 @@ fn transform_url(req: &ServiceRequest) -> String {
         default_host.as_str()
     };
     let path_and_query = uri.path_and_query().map_or("", |v| v.as_str());
-    println!("scheme: {}, host: {}, path_and_query: {}", scheme, host, path_and_query);
+    info!("scheme: {}, host: {}, path_and_query: {}", scheme, host, path_and_query);
 
     let url = Uri::builder()
         .scheme("https")
@@ -84,6 +84,6 @@ fn transform_url(req: &ServiceRequest) -> String {
         .build()
         .unwrap();
 
-    println!("tu: {}", url);
+    info!("tu: {}", url);
     format!("{}", url)
 }
