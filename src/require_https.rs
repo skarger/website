@@ -49,7 +49,7 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
         } else {
             let transformed_url = transform_url(&req);
             Either::Right(ok(req.into_response(
-                HttpResponse::Found()
+                HttpResponse::MovedPermanently()
                     .header(header::LOCATION, transformed_url)
                     .finish()
                     .into_body(),
