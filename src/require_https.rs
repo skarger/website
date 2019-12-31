@@ -2,7 +2,7 @@ use std::env;
 use std::task::{Context, Poll};
 use actix_web::{
     Error, HttpResponse,
-    http::{Uri, uri::Scheme, header},
+    http::{Uri, header},
     dev::{Service, Transform, ServiceRequest, ServiceResponse}
 };
 use futures::future::{ok, Either, Ready};
@@ -44,32 +44,46 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
     }
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
-        let scheme = req.uri().scheme();
-
-        if Some(&Scheme::HTTPS) == scheme {
+        if is_https(&req) {
             Either::Left(self.service.call(req))
         } else {
-            let uri = req.uri();
-
-            let default_uri_authority = env::var("URI_AUTHORITY").unwrap_or(String::from(""));
-            let authority = uri.authority().map_or(default_uri_authority.as_str(), |v| v.as_str());
-            let path_and_query = uri.path_and_query().map_or("", |v| v.as_str());
-            println!("uri: {}, authority: {}, path_and_query: {}", uri, authority, path_and_query);
-
-            let url = Uri::builder()
-                .scheme("https")
-                .authority(authority)
-                .path_and_query(path_and_query)
-                .build()
-                .unwrap();
-
+            let transformed_url = transform_url(&req);
 //            Either::Right(ok(req.into_response(
 //                HttpResponse::Found()
-//                    .header(header::LOCATION, format!("{}", url))
+//                    .header(header::LOCATION, transformed_url)
 //                    .finish()
 //                    .into_body(),
 //            )))
             Either::Left(self.service.call(req))
         }
     }
+}
+
+fn is_https(req: &ServiceRequest) -> bool {
+    let conn_info = req.connection_info();
+    conn_info.scheme() == "https"
+}
+
+fn transform_url(req: &ServiceRequest) -> String {
+    let uri = req.uri();
+    let conn_info = req.connection_info();
+    let scheme = conn_info.scheme();
+    let default_host = env::var("URI_AUTHORITY").unwrap_or(String::from(""));
+    let host = if conn_info.host().len() > 0 {
+        conn_info.host()
+    } else {
+        default_host.as_str()
+    };
+    let path_and_query = uri.path_and_query().map_or("", |v| v.as_str());
+    println!("scheme: {}, host: {}, path_and_query: {}", scheme, host, path_and_query);
+
+    let url = Uri::builder()
+        .scheme("https")
+        .authority(host)
+        .path_and_query(path_and_query)
+        .build()
+        .unwrap();
+
+    println!("tu: {}", url);
+    format!("{}", url)
 }
