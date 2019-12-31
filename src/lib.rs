@@ -1,9 +1,10 @@
 #[macro_use]
 extern crate diesel;
 
-use actix_files as fs;
+use actix_files::{NamedFile, Files};
 use actix_web::{
-    guard, web, HttpResponse, Result, http::StatusCode, Resource
+    HttpResponse, Responder, Resource, Result,
+    web, guard
 };
 
 use handlebars::Handlebars;
@@ -15,6 +16,9 @@ pub mod db;
 pub mod models;
 pub mod schema;
 pub mod templates { pub mod registry; }
+pub mod require_https;
+
+pub use require_https::RequireHttps;
 
 pub struct AppState<'a> {
     pub template_registry: Handlebars<'a>,
@@ -31,8 +35,8 @@ pub struct MessagePayload {
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.data(request_data())
         .service(static_files())
-        .route("/", web::get().to(home))
         .route("/favicon.ico", web::get().to(favicon))
+        .route("/", web::get().to(home))
         .route("/about", web::get().to(about))
         .route("/messages/{message_group}", web::get().to(load_message_group))
         .route("/messages/{message_group}", web::post().to(create_message_in_group));
@@ -56,50 +60,52 @@ pub fn request_data<'a>() -> AppState<'a> {
     }
 }
 
-pub fn p404(data: web::Data<AppState>) -> Result<HttpResponse> {
+pub fn p404(data: web::Data<AppState<'_>>) -> HttpResponse {
     let context = json!({
         "currentPage": "404",
         "title": "Not Found",
     });
-    Ok(HttpResponse::build(StatusCode::NOT_FOUND)
+
+    HttpResponse::NotFound()
         .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("404", &context).unwrap()))
+        .body(data.template_registry.render("404", &context).unwrap())
 }
 
-pub fn favicon() -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("static/favicon.ico")?)
+pub async fn favicon() -> Result<NamedFile> {
+    Ok(NamedFile::open("static/favicon.ico")?)
 }
 
-pub fn static_files() -> fs::Files {
-    fs::Files::new("/static", "static").show_files_listing()
+pub fn static_files() -> Files {
+    Files::new("/static", "static").show_files_listing()
 }
 
-pub fn home(data: web::Data<AppState>) -> Result<HttpResponse> {
+pub async fn home(data: web::Data<AppState<'_>>) -> impl Responder {
     let context = json!({
         "currentPage": "home",
         "title": "Home",
     });
-    Ok(HttpResponse::build(StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("home", &context).unwrap()))
 
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(data.template_registry.render("home", &context).unwrap())
 }
 
-pub fn about(data: web::Data<AppState>) -> Result<HttpResponse> {
+pub async fn about(data: web::Data<AppState<'_>>) -> impl Responder {
     let context = json!({
         "currentPage": "about",
         "title": "About",
     });
-    Ok(HttpResponse::build(StatusCode::OK)
+
+    HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("about", &context).unwrap()))
+        .body(data.template_registry.render("about", &context).unwrap())
 }
 
 pub fn register_templates<'a>() -> Handlebars<'a> {
     templates::registry::register_templates()
 }
 
-pub fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse> {
+pub async fn create_message_in_group(data: web::Data<AppState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> impl Responder {
     let message_group = &format!("{}", path);
     if !authorized(&message_group) {
         p404(data)
@@ -119,13 +125,13 @@ pub fn create_message_in_group(data: web::Data<AppState>, path: web::Path<String
         let connection = db::establish_connection();
         db::create_message(&connection, &message_payload);
 
-        Ok(HttpResponse::build(StatusCode::CREATED)
+        HttpResponse::Created()
             .content_type("application/json; charset=utf-8")
-            .json(context))
+            .json(context)
     }
 }
 
-pub fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) -> Result<HttpResponse> {
+pub async fn load_message_group(data: web::Data<AppState<'_>>, path: web::Path<String>) -> impl Responder {
     let message_group = format!("{}", path);
     if !authorized(&message_group) {
         p404(data)
@@ -158,9 +164,9 @@ pub fn load_message_group(data: web::Data<AppState>, path: web::Path<String>) ->
             "messageGroup": message_group,
         });
 
-        Ok(HttpResponse::build(StatusCode::OK)
+        HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
-            .body(data.template_registry.render("messages", &context).unwrap()))
+            .body(data.template_registry.render("messages", &context).unwrap())
     }
 }
 
