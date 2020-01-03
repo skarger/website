@@ -7,11 +7,6 @@ module.exports = {
   entry: {
     app: "./src/web/index.js",
   },
-  mode: "development",
-  devtool: "inline-source-map",
-  devServer: {
-    contentBase: './static/dist',
-  },
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "static/dist"),

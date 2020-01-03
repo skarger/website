@@ -8,8 +8,9 @@
     "yarn": "1.x"
   },
   "scripts": {
-    "build": "yarn webpack",
-    "start": "webpack-dev-server --open"
+    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "dev": "yarn webpack --config webpack.dev.js",
+    "build": "yarn webpack --config webpack.prod.js"
   },
   "browserslist": [
     ">1%",
