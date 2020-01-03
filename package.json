@@ -8,7 +8,8 @@
     "yarn": "1.x"
   },
   "scripts": {
-    "build": "yarn postcss --verbose static/style.css -o static/dist/style.css"
+    "build": "yarn postcss --verbose static/style.css -o static/dist/style.css",
+    "start": "webpack-dev-server --open"
   },
   "browserslist": [
     ">1%",

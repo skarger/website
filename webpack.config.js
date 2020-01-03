@@ -8,6 +8,9 @@ module.exports = {
   },
   mode: "development",
   devtool: "inline-source-map",
+  devServer: {
+    contentBase: './static/dist',
+  },
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "static/dist"),
