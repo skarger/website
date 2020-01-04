@@ -6,5 +6,7 @@ module.exports = merge(common, {
   devtool: "inline-source-map",
   devServer: {
     contentBase: './static/dist',
+    writeToDisk: true, // make updated files available to backend server
+    port: 8081, // avoid conflict with backend server
   },
 });

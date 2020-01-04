@@ -16,9 +16,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'style.css',
     }),
-    new HtmlWebpackPlugin({
-      title: "Output Management",
-    }),
+    new HtmlWebpackPlugin(),
   ],
   module: {
     rules: [
