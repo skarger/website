@@ -147,10 +147,17 @@ pub fn register_templates<'a>() -> Handlebars<'a> {
     templates::registry::register_templates()
 }
 
-pub async fn create_message_in_group(data: web::Data<ApplicationState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse, ApplicationError<'_>> {
+pub async fn create_message_in_group<'a>(path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse, ApplicationError<'a>> {
     let message_group = &format!("{}", path);
     if !authorized(&message_group) {
-        Ok(p404(data))
+        Ok(HttpResponse::NotFound()
+            .content_type("application/json; charset=utf-8")
+            .json(json!({
+                "error": {
+                    "status": "404",
+                    "title": "Not Found"
+                }
+            })))
     } else {
         message_payload.message_group = message_group.to_string();
         let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
@@ -158,18 +165,16 @@ pub async fn create_message_in_group(data: web::Data<ApplicationState<'_>>, path
         message_payload.author = message_author_1;
 
         let key = format!("message{}", message_payload.index);
-        let context = json!({
-            "currentPage": "messages",
-            "title": "Messages",
-            key: message_payload.body,
-        });
-
         let connection = db::establish_connection();
         db::create_message(&connection, &message_payload);
 
         Ok(HttpResponse::Created()
             .content_type("application/json; charset=utf-8")
-            .json(context))
+            .json(json!({
+            "currentPage": "messages",
+            "title": "Messages",
+            key: message_payload.body,
+        })))
     }
 }
 
