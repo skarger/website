@@ -63,7 +63,7 @@ pub struct MessagePayload {
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.data(request_data())
+    cfg.data(app_data())
         .service(static_files())
         .route("/favicon.ico", web::get().to(favicon))
         .route("/", web::get().to(home))
@@ -85,7 +85,7 @@ pub fn default_service() -> Resource {
         )
 }
 
-pub fn request_data<'a>() -> AppState<'a> {
+pub fn app_data<'a>() -> AppState<'a> {
     AppState {
         template_registry: register_templates(),
     }
