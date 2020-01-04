@@ -25,6 +25,9 @@ systemfd --no-pid -- cargo watch -x run
 ```
 
 To build CSS:
+`yarn dev`
+
+Or for production:
 `yarn build`
 
 ## Testing

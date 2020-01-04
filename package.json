@@ -8,7 +8,9 @@
     "yarn": "1.x"
   },
   "scripts": {
-    "build": "yarn postcss --verbose static/style.css -o static/dist/style.css"
+    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "dev": "yarn webpack --config webpack.dev.js",
+    "build": "yarn webpack --config webpack.prod.js"
   },
   "browserslist": [
     ">1%",
@@ -16,6 +18,16 @@
   ],
   "devDependencies": {
     "autoprefixer": "^9.7.3",
-    "postcss-cli": "^6.1.3"
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.4.1",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-cli": "^6.1.3",
+    "postcss-loader": "^3.0.0",
+    "style-loader": "^1.1.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1",
+    "webpack-merge": "^4.2.2"
   }
 }
