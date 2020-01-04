@@ -37,6 +37,6 @@ fn register_template_dir_entry(template_registry: &mut Handlebars, entry: Result
             }
         }
     } else {
-        panic!("Could not register template: {:?}", entry)
+        panic!("Error extracting DirEntry: {:?}", entry)
     }
 }
