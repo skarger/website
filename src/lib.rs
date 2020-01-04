@@ -104,28 +104,11 @@ pub fn p404(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
         .body(data.template_registry.render("404", &context).unwrap())
 }
 
-pub fn p500(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
-    let context = json!({
-            "currentPage": "500",
-            "title": "Internal Server Error",
-        });
-    let body = match data.template_registry.render("500", &context) {
-        Ok(s) => s,
-        Err(_) => String::from("Internal Server Error")
-    };
-
-    HttpResponse::InternalServerError()
-        .content_type("text/html; charset=utf-8")
-        .body(body)
-}
-
 pub async fn favicon() -> Result<NamedFile> {
     Ok(NamedFile::open("static/favicon.ico")?)
 }
 
-//pub async fn test_error(data: web::Data<AppState<'_>>) -> HttpResponse {
 pub async fn test_error(data: web::Data<ApplicationState<'_>>) -> Result<&'_ str, ApplicationError<'_>> {
-//    p500(data)
     Err(ApplicationError { data: data })
 }
 
