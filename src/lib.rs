@@ -20,21 +20,23 @@ pub mod require_https;
 
 pub use require_https::RequireHttps;
 
-pub struct AppState<'a> {
+#[derive(fmt::Debug)]
+pub struct ApplicationState<'a> {
     pub template_registry: Handlebars<'a>,
 }
 
 #[derive(fmt::Debug)]
-pub struct ApplicationError {}
+pub struct ApplicationError<'a> {
+    data: web::Data<ApplicationState<'a>>
+}
 
-impl fmt::Display for ApplicationError {
+impl fmt::Display for ApplicationError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let template_registry = register_templates();
         let context = json!({
             "currentPage": "500",
             "title": "Internal Server Error",
         });
-        let body = match template_registry.render("500", &context) {
+        let body = match self.data.template_registry.render("500", &context) {
             Ok(s) => s,
             Err(_) => String::from("Internal Server Error")
         };
@@ -42,7 +44,7 @@ impl fmt::Display for ApplicationError {
     }
 }
 
-impl error::ResponseError for ApplicationError {
+impl error::ResponseError for ApplicationError<'_> {
     fn status_code(&self) -> StatusCode {
         StatusCode::INTERNAL_SERVER_ERROR
     }
@@ -63,7 +65,7 @@ pub struct MessagePayload {
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.data(app_data())
+    cfg.data(app_state())
         .service(static_files())
         .route("/favicon.ico", web::get().to(favicon))
         .route("/", web::get().to(home))
@@ -85,13 +87,13 @@ pub fn default_service() -> Resource {
         )
 }
 
-pub fn app_data<'a>() -> AppState<'a> {
-    AppState {
+pub fn app_state<'a>() -> ApplicationState<'a> {
+    ApplicationState {
         template_registry: register_templates(),
     }
 }
 
-pub fn p404(data: web::Data<AppState<'_>>) -> HttpResponse {
+pub fn p404(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
     let context = json!({
         "currentPage": "404",
         "title": "Not Found",
@@ -102,7 +104,7 @@ pub fn p404(data: web::Data<AppState<'_>>) -> HttpResponse {
         .body(data.template_registry.render("404", &context).unwrap())
 }
 
-pub fn p500(data: web::Data<AppState<'_>>) -> HttpResponse {
+pub fn p500(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
     let context = json!({
             "currentPage": "500",
             "title": "Internal Server Error",
@@ -121,15 +123,17 @@ pub async fn favicon() -> Result<NamedFile> {
     Ok(NamedFile::open("static/favicon.ico")?)
 }
 
-pub async fn test_error() -> Result<&'static str, ApplicationError> {
-    Err(ApplicationError {})
+//pub async fn test_error(data: web::Data<AppState<'_>>) -> HttpResponse {
+pub async fn test_error(data: web::Data<ApplicationState<'_>>) -> Result<&'_ str, ApplicationError<'_>> {
+//    p500(data)
+    Err(ApplicationError { data: data })
 }
 
 pub fn static_files() -> Files {
     Files::new("/static", "static").show_files_listing()
 }
 
-pub async fn home(data: web::Data<AppState<'_>>) -> impl Responder {
+pub async fn home(data: web::Data<ApplicationState<'_>>) -> impl Responder {
     let context = json!({
         "currentPage": "home",
         "title": "Home",
@@ -140,7 +144,7 @@ pub async fn home(data: web::Data<AppState<'_>>) -> impl Responder {
         .body(data.template_registry.render("home", &context).unwrap())
 }
 
-pub async fn about(data: web::Data<AppState<'_>>) -> impl Responder {
+pub async fn about(data: web::Data<ApplicationState<'_>>) -> impl Responder {
     let context = json!({
         "currentPage": "about",
         "title": "About",
@@ -155,7 +159,7 @@ pub fn register_templates<'a>() -> Handlebars<'a> {
     templates::registry::register_templates()
 }
 
-pub async fn create_message_in_group(data: web::Data<AppState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> impl Responder {
+pub async fn create_message_in_group(data: web::Data<ApplicationState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> impl Responder {
     let message_group = &format!("{}", path);
     if !authorized(&message_group) {
         p404(data)
@@ -181,7 +185,7 @@ pub async fn create_message_in_group(data: web::Data<AppState<'_>>, path: web::P
     }
 }
 
-pub async fn load_message_group(data: web::Data<AppState<'_>>, path: web::Path<String>) -> impl Responder {
+pub async fn load_message_group(data: web::Data<ApplicationState<'_>>, path: web::Path<String>) -> impl Responder {
     let message_group = format!("{}", path);
     if !authorized(&message_group) {
         p404(data)
