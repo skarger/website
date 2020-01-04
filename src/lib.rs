@@ -4,13 +4,13 @@ extern crate diesel;
 use actix_files::{NamedFile, Files};
 use actix_web::{
     HttpResponse, Responder, Resource, Result,
-    web, guard
+    web, guard, error, http::StatusCode
 };
 
 use handlebars::Handlebars;
 use serde::Deserialize;
 use serde_json::json;
-use std::{env};
+use std::{env, fmt};
 
 pub mod db;
 pub mod models;
@@ -22,6 +22,36 @@ pub use require_https::RequireHttps;
 
 pub struct AppState<'a> {
     pub template_registry: Handlebars<'a>,
+}
+
+#[derive(fmt::Debug)]
+pub struct ApplicationError {}
+
+impl fmt::Display for ApplicationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let template_registry = register_templates();
+        let context = json!({
+            "currentPage": "500",
+            "title": "Internal Server Error",
+        });
+        let body = match template_registry.render("500", &context) {
+            Ok(s) => s,
+            Err(_) => String::from("Internal Server Error")
+        };
+        write!(f, "{}", body)
+    }
+}
+
+impl error::ResponseError for ApplicationError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .content_type("text/html; charset=utf-8")
+            .body(self.to_string())
+    }
 }
 
 #[derive(Deserialize)]
@@ -38,6 +68,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .route("/favicon.ico", web::get().to(favicon))
         .route("/", web::get().to(home))
         .route("/about", web::get().to(about))
+        .route("/error", web::get().to(test_error))
         .route("/messages/{message_group}", web::get().to(load_message_group))
         .route("/messages/{message_group}", web::post().to(create_message_in_group));
 }
@@ -73,6 +104,10 @@ pub fn p404(data: web::Data<AppState<'_>>) -> HttpResponse {
 
 pub async fn favicon() -> Result<NamedFile> {
     Ok(NamedFile::open("static/favicon.ico")?)
+}
+
+pub async fn test_error() -> Result<&'static str, ApplicationError> {
+    Err(ApplicationError {})
 }
 
 pub fn static_files() -> Files {
