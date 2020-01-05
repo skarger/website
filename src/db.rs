@@ -1,17 +1,40 @@
 use diesel::Connection;
 use diesel::pg::PgConnection;
+use log::warn;
 use std::env;
 
 use crate::schema;
 use crate::models::{Message,NewMessage};
 use crate::diesel::prelude::*;
 use crate::MessagePayload;
+use diesel::r2d2::ConnectionManager;
+
+pub type ConnectionPool = diesel::r2d2::Pool<ConnectionManager<PgConnection>>;
+pub type PooledConnection = diesel::r2d2::PooledConnection<ConnectionManager<PgConnection>>;
 
 pub fn establish_connection() -> PgConnection {
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
     PgConnection::establish(&database_url)
         .expect(&format!("Error connecting to {}", database_url))
+}
+
+pub fn connection_pool() -> ConnectionPool {
+    use std::time::Duration;
+
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+    let manager = diesel::r2d2::ConnectionManager::<PgConnection>::new(database_url);
+    let pool = diesel::r2d2::Pool::builder()
+        .max_size(8) // by default actix spins up 8 server workers, the N of logical CPUs on a Heroku hobby dev dyno
+        .connection_timeout(Duration::new(10, 0))
+        .build(manager);
+
+    if pool.is_err() {
+        warn!("Could not create connection pool.")
+    }
+
+    pool.unwrap()
 }
 
 pub fn message_bodies_for_group<'a>(connection: &PgConnection, message_group: &str) -> Result<Vec<String>, diesel::result::Error> {
