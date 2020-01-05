@@ -1,8 +1,13 @@
 use actix_web::{test, http::StatusCode, App};
 use web_server;
 
+mod common { pub mod environment; }
+use crate::common::environment::load_env;
+
 #[actix_rt::test]
 async fn default_service() {
+    load_env();
+
     let mut app = test::init_service(
         App::new()
             .configure(web_server::config)

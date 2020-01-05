@@ -3,14 +3,15 @@ extern crate diesel;
 
 use actix_files::{NamedFile, Files};
 use actix_web::{
-    HttpResponse, Responder, Resource, Result,
-    web, guard
+    HttpResponse, Resource, Result,
+    web, guard, error, http::StatusCode,
 };
 
 use handlebars::Handlebars;
+use log::warn;
 use serde::Deserialize;
 use serde_json::json;
-use std::{env};
+use std::{env, fmt};
 
 pub mod db;
 pub mod models;
@@ -20,8 +21,30 @@ pub mod require_https;
 
 pub use require_https::RequireHttps;
 
-pub struct AppState<'a> {
+pub struct ApplicationState<'a> {
     pub template_registry: Handlebars<'a>,
+    pub connection_pool: db::ConnectionPool,
+}
+
+#[derive(fmt::Debug)]
+pub struct ApplicationError {}
+
+impl fmt::Display for ApplicationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", error_body())
+    }
+}
+
+impl error::ResponseError for ApplicationError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .content_type("text/html; charset=utf-8")
+            .body(self.to_string())
+    }
 }
 
 #[derive(Deserialize)]
@@ -33,11 +56,12 @@ pub struct MessagePayload {
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.data(request_data())
+    cfg.data(app_state())
         .service(static_files())
         .route("/favicon.ico", web::get().to(favicon))
         .route("/", web::get().to(home))
         .route("/about", web::get().to(about))
+        .route("/error", web::get().to(test_error))
         .route("/messages/{message_group}", web::get().to(load_message_group))
         .route("/messages/{message_group}", web::post().to(create_message_in_group));
 }
@@ -54,90 +78,146 @@ pub fn default_service() -> Resource {
         )
 }
 
-pub fn request_data<'a>() -> AppState<'a> {
-    AppState {
+pub fn app_state<'a>() -> ApplicationState<'a> {
+    ApplicationState {
         template_registry: register_templates(),
+        connection_pool: db::connection_pool(),
     }
 }
 
-pub fn p404(data: web::Data<AppState<'_>>) -> HttpResponse {
+pub fn error_body() -> String {
+    let mut registry = Handlebars::new();
+    let registration = registry.register_template_file("application", "./src/templates/partials/application.hbs")
+        .and_then(|_| registry.register_template_file("header", "./src/templates/partials/header.hbs"))
+        .and_then(|_| registry.register_template_file("500", "./src/templates/500.hbs"));
+    if registration.is_err() {
+        warn!("ApplicationError: could not register error template");
+    }
+
+    let context = json!({
+            "currentPage": "500",
+            "title": "Internal Server Error",
+        });
+    let error_html = registry.render("500", &context);
+    error_html.unwrap_or("Internal Server Error".to_string())
+}
+
+pub fn error_json() -> serde_json::Value {
+    json!({
+        "error": {
+            "status": "500",
+            "title": "Internal Server Error",
+        }
+    })
+}
+
+pub fn not_found_json() -> serde_json::Value {
+    json!({
+        "error": {
+            "status": "404",
+            "title": "Not Found",
+        }
+    })
+}
+
+pub fn p404(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
     let context = json!({
         "currentPage": "404",
         "title": "Not Found",
     });
 
+    let body = data.template_registry.render("404", &context).unwrap_or("Not Found".to_string());
     HttpResponse::NotFound()
         .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("404", &context).unwrap())
+        .body(body)
 }
 
 pub async fn favicon() -> Result<NamedFile> {
     Ok(NamedFile::open("static/favicon.ico")?)
 }
 
+pub async fn test_error() -> Result<&'static str, ApplicationError> {
+    Err(ApplicationError {})
+}
+
 pub fn static_files() -> Files {
     Files::new("/static", "static").show_files_listing()
 }
 
-pub async fn home(data: web::Data<AppState<'_>>) -> impl Responder {
+pub async fn home(data: web::Data<ApplicationState<'_>>) -> Result<HttpResponse, ApplicationError> {
     let context = json!({
         "currentPage": "home",
         "title": "Home",
     });
 
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("home", &context).unwrap())
+    render_html(data, StatusCode::OK, "home", context)
 }
 
-pub async fn about(data: web::Data<AppState<'_>>) -> impl Responder {
+pub fn render_html(data: web::Data<ApplicationState>, status_code: StatusCode, template_name: &str, context: serde_json::Value) -> Result<HttpResponse, ApplicationError> {
+    match data.template_registry.render(template_name, &context) {
+        Ok(s) => {
+            Ok(HttpResponse::build(status_code)
+                .content_type("text/html; charset=utf-8")
+                .body(s))
+        },
+        Err(_) => Err(ApplicationError {})
+    }
+}
+
+pub async fn about(data: web::Data<ApplicationState<'_>>) -> Result<HttpResponse, ApplicationError> {
     let context = json!({
         "currentPage": "about",
         "title": "About",
     });
 
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(data.template_registry.render("about", &context).unwrap())
+    render_html(data, StatusCode::OK, "about", context)
 }
 
 pub fn register_templates<'a>() -> Handlebars<'a> {
     templates::registry::register_templates()
 }
 
-pub async fn create_message_in_group(data: web::Data<AppState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> impl Responder {
+pub async fn create_message_in_group<'a>(data: web::Data<ApplicationState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse, ApplicationError> {
     let message_group = &format!("{}", path);
     if !authorized(&message_group) {
-        p404(data)
+        Ok(HttpResponse::NotFound()
+            .content_type("application/json; charset=utf-8")
+            .json(not_found_json()))
     } else {
         message_payload.message_group = message_group.to_string();
-        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
-            .unwrap_or_else(|_| "".to_string());
+        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID").unwrap_or("".to_string());
         message_payload.author = message_author_1;
 
         let key = format!("message{}", message_payload.index);
-        let context = json!({
-            "currentPage": "messages",
-            "title": "Messages",
-            key: message_payload.body,
-        });
-
-        let connection = db::establish_connection();
-        db::create_message(&connection, &message_payload);
-
-        HttpResponse::Created()
-            .content_type("application/json; charset=utf-8")
-            .json(context)
+        let connection = db_connection(&data.connection_pool)?;
+        if db::create_message(&connection, &message_payload).is_ok() {
+            Ok(HttpResponse::Created()
+                .content_type("application/json; charset=utf-8")
+                .json(json!({
+                    "currentPage": "messages",
+                    "title": "Messages",
+                    key: message_payload.body,
+                })))
+        } else {
+            Ok(HttpResponse::InternalServerError()
+                .content_type("application/json; charset=utf-8")
+                .json(error_json()))
+        }
     }
 }
 
-pub async fn load_message_group(data: web::Data<AppState<'_>>, path: web::Path<String>) -> impl Responder {
+pub async fn load_message_group(data: web::Data<ApplicationState<'_>>, path: web::Path<String>) -> Result<HttpResponse, ApplicationError> {
     let message_group = format!("{}", path);
     if !authorized(&message_group) {
-        p404(data)
+        Ok(p404(data))
     } else {
-        let connection = db::establish_connection();
-        let new_messages = db::message_bodies_for_group(&connection, &message_group);
+        let connection = db_connection(&data.connection_pool)?;
+        let query_result = db::message_bodies_for_group(&connection, &message_group);
+        let new_messages = if query_result.is_err() {
+            return Err(ApplicationError {});
+        } else {
+            query_result.unwrap()
+        };
 
         let button_text_1 = button_text(&new_messages[1]);
         let input_disabled_1 = input_disabled(&new_messages[1]);
@@ -164,10 +244,12 @@ pub async fn load_message_group(data: web::Data<AppState<'_>>, path: web::Path<S
             "messageGroup": message_group,
         });
 
-        HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(data.template_registry.render("messages", &context).unwrap())
+        render_html(data, StatusCode::OK, "messages", context)
     }
+}
+
+fn db_connection(connection_pool: &db::ConnectionPool) -> Result<db::PooledConnection, ApplicationError>{
+    connection_pool.get().map_err(|_| ApplicationError {})
 }
 
 fn paragraphs(body: &str) -> String {
@@ -199,6 +281,6 @@ fn guidance(body: &str) -> &str {
 }
 
 fn authorized(message_group: &str) -> bool {
-    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap();
+    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap_or("".to_string());
     message_group == allowed_message_group
 }

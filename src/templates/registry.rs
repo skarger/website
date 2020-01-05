@@ -1,6 +1,9 @@
 pub use handlebars::Handlebars;
 use std::path::Path;
 
+// We call register_templates on startup for each web worker.
+// If that encounters problems then we do not know which templates, if any, that we can reliably render.
+// We treat that an unrecoverable error, so this function may panic.
 pub fn register_templates<'a>() -> Handlebars<'a> {
     let mut template_registry = Handlebars::new();
     template_registry.set_strict_mode(true);
@@ -34,6 +37,6 @@ fn register_template_dir_entry(template_registry: &mut Handlebars, entry: Result
             }
         }
     } else {
-        panic!("Could not register template: {:?}", entry)
+        panic!("Error extracting DirEntry: {:?}", entry)
     }
 }
