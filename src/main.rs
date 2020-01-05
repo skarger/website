@@ -11,13 +11,14 @@ use web_server;
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     dotenv().ok();
-    env::set_var("RUST_LOG", "actix_web=info,web-server=info");
+    env::set_var("RUST_LOG", "actix_web=info,web_server=info");
     env_logger::init();
 
     let mut listenfd = ListenFd::from_env();
 
     let app_environment = env::var("APP_ENVIRONMENT")
         .unwrap_or("development".to_string());
+    info!("Initializing in {} mode.", app_environment);
 
     let require_https = app_environment == "production" || app_environment == "staging";
 
@@ -28,6 +29,7 @@ async fn main() -> io::Result<()> {
         .expect("PORT must be a number");
 
     let mut server = HttpServer::new(move || {
+        info!("Starting server worker.");
         App::new()
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().header("Cache-Control", "max-age=0"))
@@ -44,6 +46,5 @@ async fn main() -> io::Result<()> {
         server.bind(("0.0.0.0", port))?
     };
 
-    info!("Starting server in {} mode.", app_environment);
     server.run().await
 }
