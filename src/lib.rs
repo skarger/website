@@ -4,7 +4,8 @@ extern crate diesel;
 use actix_files::{NamedFile, Files};
 use actix_web::{
     HttpResponse, Resource, Result,
-    web, guard, error, http::StatusCode
+    web, guard, error, http::StatusCode,
+    dev::ServiceRequest
 };
 
 use handlebars::Handlebars;
@@ -87,6 +88,16 @@ pub fn default_service() -> Resource {
 pub fn app_state<'a>() -> ApplicationState<'a> {
     ApplicationState {
         template_registry: register_templates(),
+    }
+}
+
+pub fn error_body(req: &ServiceRequest) -> String {
+    let default = "Internal Server Error".to_string();
+    let web_data : std::option::Option<actix_web::web::Data<ApplicationState>>  = req.app_data();
+    if let Some(web_data) = web_data {
+        web_data.template_registry.render("500", &json!({})).unwrap_or(default)
+    } else {
+        default
     }
 }
 

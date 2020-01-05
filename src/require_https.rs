@@ -1,12 +1,9 @@
-use actix_web::{
-    Error, HttpResponse,
-    http::{Uri, header},
-    dev::{Service, Transform, ServiceRequest, ServiceResponse},
-};
+use actix_web::{Error, HttpResponse, http::{Uri, header}, dev::{Service, Transform, ServiceRequest, ServiceResponse}};
 use futures::future::{ok, Either, Ready};
 use log::warn;
 use std::env;
 use std::task::{Context, Poll};
+use crate::error_body;
 
 pub struct RequireHttps;
 
@@ -58,7 +55,7 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
             } else {
                 warn!("RequireHttps: Error transforming URL: {}", transformed_url.unwrap_err());
                 HttpResponse::InternalServerError()
-                    .body("Internal Server Error")
+                    .body(error_body(&req))
                     .into_body()
             };
 
