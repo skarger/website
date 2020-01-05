@@ -26,7 +26,7 @@ pub fn connection_pool() -> ConnectionPool {
         .expect("DATABASE_URL must be set");
     let manager = diesel::r2d2::ConnectionManager::<PgConnection>::new(database_url);
     let pool = diesel::r2d2::Pool::builder()
-        .max_size(8) // by default actix spins up 8 server workers, the N of logical CPUs on a Heroku hobby dev dyno
+        .max_size(1)
         .connection_timeout(Duration::new(10, 0))
         .build(manager);
 
