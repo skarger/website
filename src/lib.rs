@@ -36,7 +36,7 @@ impl fmt::Display for ApplicationError<'_> {
             "currentPage": "500",
             "title": "Internal Server Error",
         });
-        let body = self.data.template_registry.render("500", &context).unwrap_or(String::from("Internal Server Error"));
+        let body = self.data.template_registry.render("500", &context).unwrap_or("Internal Server Error".to_string());
         write!(f, "{}", body)
     }
 }
@@ -96,7 +96,7 @@ pub fn p404(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
         "title": "Not Found",
     });
 
-    let body = data.template_registry.render("404", &context).unwrap_or(String::from("Not Found"));
+    let body = data.template_registry.render("404", &context).unwrap_or("Not Found".to_string());
     HttpResponse::NotFound()
         .content_type("text/html; charset=utf-8")
         .body(body)
@@ -160,8 +160,7 @@ pub async fn create_message_in_group<'a>(path: web::Path<String>, mut message_pa
             })))
     } else {
         message_payload.message_group = message_group.to_string();
-        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID")
-            .unwrap_or_else(|_| "".to_string());
+        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID").unwrap_or("".to_string());
         message_payload.author = message_author_1;
 
         let key = format!("message{}", message_payload.index);
@@ -244,6 +243,6 @@ fn guidance(body: &str) -> &str {
 }
 
 fn authorized(message_group: &str) -> bool {
-    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap();
+    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap_or("".to_string());
     message_group == allowed_message_group
 }

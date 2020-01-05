@@ -17,13 +17,13 @@ async fn main() -> io::Result<()> {
     let mut listenfd = ListenFd::from_env();
 
     let app_environment = env::var("APP_ENVIRONMENT")
-        .unwrap_or_else(|_| "development".to_string());
+        .unwrap_or("development".to_string());
 
     let require_https = app_environment == "production" || app_environment == "staging";
 
     // Get the port number to listen on.
     let port = env::var("PORT")
-        .unwrap_or_else(|_| "8080".to_string())
+        .unwrap_or("8080".to_string())
         .parse()
         .expect("PORT must be a number");
 
@@ -38,7 +38,7 @@ async fn main() -> io::Result<()> {
             .default_service(web_server::default_service())
     });
 
-    server = if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {
+    server = if let Some(l) = listenfd.take_tcp_listener(0).expect("Error creating server: listenfd.take_tcp_listener failed") {
         server.listen(l)?
     } else {
         server.bind(("0.0.0.0", port))?
