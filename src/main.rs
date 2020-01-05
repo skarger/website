@@ -1,11 +1,9 @@
-#[macro_use]
-extern crate log;
-
 use actix_web::{
     middleware, App, HttpServer
 };
 use dotenv::dotenv;
 use listenfd::ListenFd;
+use log::info;
 use std::{env, io};
 
 use web_server;
@@ -13,7 +11,7 @@ use web_server;
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     dotenv().ok();
-    env::set_var("RUST_LOG", "actix_web=info,web=info");
+    env::set_var("RUST_LOG", "actix_web=info,web-server=info");
     env_logger::init();
 
     let mut listenfd = ListenFd::from_env();
