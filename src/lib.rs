@@ -5,7 +5,6 @@ use actix_files::{NamedFile, Files};
 use actix_web::{
     HttpResponse, Resource, Result,
     web, guard, error, http::StatusCode,
-    dev::ServiceRequest
 };
 
 use handlebars::Handlebars;
@@ -30,28 +29,9 @@ pub struct ApplicationState<'a> {
 #[derive(fmt::Debug)]
 pub struct ApplicationError {}
 
-impl ApplicationError {
-    fn error_body(&self) -> String {
-        let mut registry = Handlebars::new();
-        let registration = registry.register_template_file("application", "./src/templates/partials/application.hbs")
-            .and_then(|_| registry.register_template_file("header", "./src/templates/partials/header.hbs"))
-            .and_then(|_| registry.register_template_file("500", "./src/templates/500.hbs"));
-        if registration.is_err() {
-            warn!("ApplicationError: could not register error template");
-        }
-
-        let context = json!({
-            "currentPage": "500",
-            "title": "Internal Server Error",
-        });
-        let error_html = registry.render("500", &context);
-        error_html.unwrap_or("Internal Server Error".to_string())
-    }
-}
-
 impl fmt::Display for ApplicationError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.error_body())
+        write!(f, "{}", error_body())
     }
 }
 
@@ -105,18 +85,21 @@ pub fn app_state<'a>() -> ApplicationState<'a> {
     }
 }
 
-pub fn error_body(req: &ServiceRequest) -> String {
-    let default = "Internal Server Error".to_string();
-    let web_data : std::option::Option<actix_web::web::Data<ApplicationState>>  = req.app_data();
-    if let Some(web_data) = web_data {
-        let context = json!({
-            "status": "500",
-            "title": "Internal Server Error"
-        });
-        web_data.template_registry.render("500", &context).unwrap_or(default)
-    } else {
-        default
+pub fn error_body() -> String {
+    let mut registry = Handlebars::new();
+    let registration = registry.register_template_file("application", "./src/templates/partials/application.hbs")
+        .and_then(|_| registry.register_template_file("header", "./src/templates/partials/header.hbs"))
+        .and_then(|_| registry.register_template_file("500", "./src/templates/500.hbs"));
+    if registration.is_err() {
+        warn!("ApplicationError: could not register error template");
     }
+
+    let context = json!({
+            "currentPage": "500",
+            "title": "Internal Server Error",
+        });
+    let error_html = registry.render("500", &context);
+    error_html.unwrap_or("Internal Server Error".to_string())
 }
 
 pub fn error_json() -> serde_json::Value {

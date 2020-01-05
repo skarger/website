@@ -55,7 +55,7 @@ impl<S, B> Service for RequireHttpsMiddleware<S>
             } else {
                 warn!("RequireHttps: Error transforming URL: {}", transformed_url.unwrap_err());
                 HttpResponse::InternalServerError()
-                    .body(error_body(&req))
+                    .body(error_body())
                     .into_body()
             };
 
