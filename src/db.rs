@@ -1,4 +1,3 @@
-
 use diesel::Connection;
 use diesel::pg::PgConnection;
 use std::env;
@@ -15,15 +14,15 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-pub fn message_bodies_for_group<'a>(connection: &PgConnection, message_group: &str) -> Vec<String> {
-    vec![load_message_body(&connection, message_group, 0),
-         load_message_body(&connection, message_group, 1),
-         load_message_body(&connection, message_group, 2),
-         load_message_body(&connection, message_group, 3)]
+pub fn message_bodies_for_group<'a>(connection: &PgConnection, message_group: &str) -> Result<Vec<String>, diesel::result::Error> {
+    Ok(vec![load_message_body(&connection, message_group, 0)?,
+         load_message_body(&connection, message_group, 1)?,
+         load_message_body(&connection, message_group, 2)?,
+         load_message_body(&connection, message_group, 3)?])
 }
 
-pub fn load_message_body(connection: &PgConnection, message_group: &str, message_index: i32) -> String {
-    let messages: Vec<Message>  = latest_messages(connection, message_group, message_index);
+pub fn load_message_body(connection: &PgConnection, message_group: &str, message_index: i32) -> Result<String, diesel::result::Error> {
+    let messages: Vec<Message>  = latest_messages(connection, message_group, message_index)?;
 
     let mut body = String::new();
     if messages.len() > 0 {
@@ -32,22 +31,20 @@ pub fn load_message_body(connection: &PgConnection, message_group: &str, message
             None => {}
         }
     }
-    body
+    Ok(body)
 }
 
-pub fn latest_messages(connection: &PgConnection, msg_group: &str, message_index: i32) -> Vec<Message> {
+pub fn latest_messages(connection: &PgConnection, msg_group: &str, message_index: i32) -> diesel::result::QueryResult<Vec<Message>> {
     use self::schema::messages::dsl::*;
 
     let latest_messages = messages.filter(message_group.eq(msg_group).and(index.eq(message_index)))
         .order(created_at.desc())
         .limit(1);
 
-    latest_messages
-        .load::<Message>(connection)
-        .expect("Error loading messages")
+    latest_messages.load::<Message>(connection)
 }
 
-pub fn create_message(connection: &PgConnection, message_payload: &MessagePayload) -> Message {
+pub fn create_message(connection: &PgConnection, message_payload: &MessagePayload) -> diesel::result::QueryResult<Message> {
     use self::schema::messages;
 
     let new_message = NewMessage {
@@ -60,5 +57,4 @@ pub fn create_message(connection: &PgConnection, message_payload: &MessagePayloa
     diesel::insert_into(messages::table)
         .values(&new_message)
         .get_result(connection)
-        .expect("Error saving new message")
 }

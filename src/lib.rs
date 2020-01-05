@@ -95,10 +95,32 @@ pub fn error_body(req: &ServiceRequest) -> String {
     let default = "Internal Server Error".to_string();
     let web_data : std::option::Option<actix_web::web::Data<ApplicationState>>  = req.app_data();
     if let Some(web_data) = web_data {
-        web_data.template_registry.render("500", &json!({})).unwrap_or(default)
+        let context = json!({
+            "status": "500",
+            "title": "Internal Server Error"
+        });
+        web_data.template_registry.render("500", &context).unwrap_or(default)
     } else {
         default
     }
+}
+
+pub fn error_json() -> serde_json::Value {
+    json!({
+        "error": {
+            "status": "500",
+            "title": "Internal Server Error",
+        }
+    })
+}
+
+pub fn not_found_json() -> serde_json::Value {
+    json!({
+        "error": {
+            "status": "404",
+            "title": "Not Found",
+        }
+    })
 }
 
 pub fn p404(data: web::Data<ApplicationState<'_>>) -> HttpResponse {
@@ -163,12 +185,7 @@ pub async fn create_message_in_group<'a>(path: web::Path<String>, mut message_pa
     if !authorized(&message_group) {
         Ok(HttpResponse::NotFound()
             .content_type("application/json; charset=utf-8")
-            .json(json!({
-                "error": {
-                    "status": "404",
-                    "title": "Not Found"
-                }
-            })))
+            .json(not_found_json()))
     } else {
         message_payload.message_group = message_group.to_string();
         let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID").unwrap_or("".to_string());
@@ -176,15 +193,19 @@ pub async fn create_message_in_group<'a>(path: web::Path<String>, mut message_pa
 
         let key = format!("message{}", message_payload.index);
         let connection = db::establish_connection();
-        db::create_message(&connection, &message_payload);
-
-        Ok(HttpResponse::Created()
-            .content_type("application/json; charset=utf-8")
-            .json(json!({
-            "currentPage": "messages",
-            "title": "Messages",
-            key: message_payload.body,
-        })))
+        if db::create_message(&connection, &message_payload).is_ok() {
+            Ok(HttpResponse::Created()
+                .content_type("application/json; charset=utf-8")
+                .json(json!({
+                    "currentPage": "messages",
+                    "title": "Messages",
+                    key: message_payload.body,
+                })))
+        } else {
+            Ok(HttpResponse::InternalServerError()
+                .content_type("application/json; charset=utf-8")
+                .json(error_json()))
+        }
     }
 }
 
@@ -194,7 +215,12 @@ pub async fn load_message_group(data: web::Data<ApplicationState<'_>>, path: web
         Ok(p404(data))
     } else {
         let connection = db::establish_connection();
-        let new_messages = db::message_bodies_for_group(&connection, &message_group);
+        let query_result = db::message_bodies_for_group(&connection, &message_group);
+        let new_messages = if query_result.is_err() {
+            return Err(ApplicationError { data });
+        } else {
+            query_result.unwrap()
+        };
 
         let button_text_1 = button_text(&new_messages[1]);
         let input_disabled_1 = input_disabled(&new_messages[1]);
