@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate diesel;
-
 use actix_files::{NamedFile, Files};
 use actix_web::{
     HttpResponse, Resource, Result,
@@ -9,9 +6,8 @@ use actix_web::{
 
 use handlebars::Handlebars;
 use log::warn;
-use serde::Deserialize;
 use serde_json::json;
-use std::{env, fmt};
+use std::{fmt};
 
 pub mod db;
 pub mod models;
@@ -47,23 +43,13 @@ impl error::ResponseError for ApplicationError {
     }
 }
 
-#[derive(Deserialize)]
-pub struct MessagePayload {
-    pub message_group: String,
-    pub index: i32,
-    pub body: String,
-    pub author: String,
-}
-
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.data(app_state())
         .service(static_files())
         .route("/favicon.ico", web::get().to(favicon))
         .route("/", web::get().to(home))
         .route("/about", web::get().to(about))
-        .route("/error", web::get().to(test_error))
-        .route("/messages/{message_group}", web::get().to(load_message_group))
-        .route("/messages/{message_group}", web::post().to(create_message_in_group));
+        .route("/error", web::get().to(test_error));
 }
 
 pub fn default_service() -> Resource {
@@ -177,110 +163,3 @@ pub fn register_templates<'a>() -> Handlebars<'a> {
     templates::registry::register_templates()
 }
 
-pub async fn create_message_in_group<'a>(data: web::Data<ApplicationState<'_>>, path: web::Path<String>, mut message_payload: web::Json<MessagePayload>) -> Result<HttpResponse, ApplicationError> {
-    let message_group = &format!("{}", path);
-    if !authorized(&message_group) {
-        Ok(HttpResponse::NotFound()
-            .content_type("application/json; charset=utf-8")
-            .json(not_found_json()))
-    } else {
-        message_payload.message_group = message_group.to_string();
-        let message_author_1 = env::var("MESSAGE_AUTHOR_1_ID").unwrap_or("".to_string());
-        message_payload.author = message_author_1;
-
-        let key = format!("message{}", message_payload.index);
-        let connection = db_connection(&data.connection_pool)?;
-        if db::create_message(&connection, &message_payload).is_ok() {
-            Ok(HttpResponse::Created()
-                .content_type("application/json; charset=utf-8")
-                .json(json!({
-                    "currentPage": "messages",
-                    "title": "Messages",
-                    key: message_payload.body,
-                })))
-        } else {
-            Ok(HttpResponse::InternalServerError()
-                .content_type("application/json; charset=utf-8")
-                .json(error_json()))
-        }
-    }
-}
-
-pub async fn load_message_group(data: web::Data<ApplicationState<'_>>, path: web::Path<String>) -> Result<HttpResponse, ApplicationError> {
-    let message_group = format!("{}", path);
-    if !authorized(&message_group) {
-        Ok(p404(data))
-    } else {
-        let connection = db_connection(&data.connection_pool)?;
-        let query_result = db::message_bodies_for_group(&connection, &message_group);
-        let new_messages = if query_result.is_err() {
-            return Err(ApplicationError {});
-        } else {
-            query_result.unwrap()
-        };
-
-        let button_text_1 = button_text(&new_messages[1]);
-        let input_disabled_1 = input_disabled(&new_messages[1]);
-        let button_text_3 = button_text(&new_messages[3]);
-        let input_disabled_3 = input_disabled(&new_messages[3]);
-        let guidance_1 = guidance(&new_messages[1]);
-        let guidance_3 = guidance(&new_messages[3]);
-
-        let context = json!({
-            "currentPage": "messages",
-            "title": "Messages",
-            "author0": "a0",
-            "author1": "a1",
-            "message0": paragraphs(&new_messages[0]),
-            "message1": &new_messages[1],
-            "inputDisabled1": input_disabled_1,
-            "buttonText1": button_text_1,
-            "guidance1": guidance_1,
-            "message2": paragraphs(&new_messages[2]),
-            "inputDisabled3": input_disabled_3,
-            "buttonText3": button_text_3,
-            "guidance3": guidance_3,
-            "message3": &new_messages[3],
-            "messageGroup": message_group,
-        });
-
-        render_html(data, StatusCode::OK, "messages", context)
-    }
-}
-
-fn db_connection(connection_pool: &db::ConnectionPool) -> Result<db::PooledConnection, ApplicationError>{
-    connection_pool.get().map_err(|_| ApplicationError {})
-}
-
-fn paragraphs(body: &str) -> String {
-    body.split("\n").map(|paragraph| format!("<p>{}</p>", paragraph)).collect::<Vec<String>>().join("")
-}
-
-fn button_text(body: &str) -> &str {
-    if body.len() > 0 {
-        "Edit"
-    } else {
-        "Save"
-    }
-}
-
-fn input_disabled(body: &str) -> &str {
-    if body.len() > 0 {
-        "disabled"
-    } else {
-        ""
-    }
-}
-
-fn guidance(body: &str) -> &str {
-    if body.len() > 0 {
-        ""
-    } else {
-        "You will be able to edit after saving."
-    }
-}
-
-fn authorized(message_group: &str) -> bool {
-    let allowed_message_group = env::var("MESSAGE_GROUP_ID").unwrap_or("".to_string());
-    message_group == allowed_message_group
-}
