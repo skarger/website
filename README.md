@@ -16,12 +16,12 @@ The `PORT` environment variable can override that.
 
 To run in watch mode, restarting the server on code changes, first install helpers:
 ```
-cargo install systemfd cargo-watch
+cargo install cargo-watch
 ```
 
 Then run this command:
 ```
-systemfd --no-pid -- cargo watch -x run
+ cargo watch -x 'run --bin web-server'
 ```
 
 To build CSS:

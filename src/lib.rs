@@ -1,4 +1,5 @@
-use actix_files::{NamedFile, Files};
+use actix_files::NamedFile;
+use actix_files as fs;
 use actix_web::{
     HttpResponse, Resource, Result,
     web, guard, error, http::StatusCode,
@@ -126,8 +127,8 @@ pub async fn test_error() -> Result<&'static str, ApplicationError> {
     Err(ApplicationError {})
 }
 
-pub fn static_files() -> Files {
-    Files::new("/static", "static").show_files_listing()
+pub fn static_files() -> fs::Files {
+    fs::Files::new("/static", "static").show_files_listing()
 }
 
 pub async fn home(data: web::Data<ApplicationState<'_>>) -> Result<HttpResponse, ApplicationError> {
