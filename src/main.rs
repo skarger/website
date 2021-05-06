@@ -4,12 +4,11 @@ use actix_web::{
 use dotenv::dotenv;
 use listenfd::ListenFd;
 use log::info;
-use std::{env, io};
-
+use std::{env};
 use web_server;
 
-#[actix_rt::main]
-async fn main() -> io::Result<()> {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env::set_var("RUST_LOG", "actix_web=info,web_server=info");
     env_logger::init();
